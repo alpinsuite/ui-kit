@@ -1,0 +1,3 @@
+# The gallery is held to the same standard as the kit it demonstrates, so there
+# is one place to change a lint rather than two that drift apart.
+include: ../analysis_options.yaml

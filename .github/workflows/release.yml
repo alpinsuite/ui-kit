@@ -1,0 +1,128 @@
+name: Release
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Existing tag to (re)publish, e.g. v0.1.0"
+        required: true
+
+permissions:
+  contents: write
+
+env:
+  FLUTTER_VERSION: "3.44.8"
+
+jobs:
+  verify:
+    name: Verify the tagged commit
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.tag || github.ref }}
+
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable
+          cache: true
+
+      - name: Read the version and check it matches the tag
+        id: version
+        run: |
+          VERSION="$(bash tools/set_version.sh)"
+          TAG="${{ github.event.inputs.tag || github.ref_name }}"
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          if [ "v$VERSION" != "$TAG" ]; then
+            echo "::error::tag $TAG does not match pubspec version $VERSION."
+            echo "::error::Run tools/set_version.sh ${TAG#v} and commit before tagging."
+            exit 1
+          fi
+          echo "releasing $VERSION"
+
+      - name: Check the changelog has a section for this version
+        # The release notes are this section verbatim. An empty one means the
+        # release ships with nothing a user can read.
+        run: |
+          VERSION="${{ steps.version.outputs.version }}"
+          if ! grep -qE "^## \[$VERSION\]" CHANGELOG.md; then
+            echo "::error::CHANGELOG.md has no '## [$VERSION]' section"
+            exit 1
+          fi
+
+      - run: flutter pub get
+
+      - name: Check formatting
+        run: dart format --set-exit-if-changed .
+
+      - name: Analyze
+        run: flutter analyze --fatal-infos
+
+      - name: Check the kit is still liftable
+        run: bash tools/check_kit_purity.sh
+
+      - run: flutter test
+
+      - name: Publish dry run
+        run: dart pub publish --dry-run
+
+  publish:
+    name: Publish the release
+    needs: verify
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.tag || github.ref }}
+          fetch-depth: 0
+
+      - name: Extract this version's changelog section
+        id: notes
+        run: |
+          VERSION="${{ needs.verify.outputs.version }}"
+          # Everything between this version's heading and the next one.
+          awk -v version="$VERSION" '
+            $0 ~ "^## \\[" version "\\]" { collecting = 1; next }
+            collecting && /^## \[/ { exit }
+            collecting { print }
+          ' CHANGELOG.md > release-notes.md
+          {
+            echo ""
+            echo "## Using this version"
+            echo ""
+            echo '```yaml'
+            echo "dependencies:"
+            echo "  slate_ui:"
+            echo "    git:"
+            echo "      url: https://github.com/alpinsuite/ui-kit.git"
+            echo "      ref: v${VERSION}"
+            echo '```'
+          } >> release-notes.md
+          cat release-notes.md
+
+      - name: Create the GitHub release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.event.inputs.tag || github.ref_name }}
+          name: Slate ${{ needs.verify.outputs.version }}
+          body_path: release-notes.md
+          draft: false
+          # A version containing a hyphen (0.2.0-rc.1) is a prerelease.
+          prerelease: ${{ contains(needs.verify.outputs.version, '-') }}
+
+  # Publishing to pub.dev is deliberately a separate, manually-triggered job.
+  # It needs the package claimed on pub.dev and this repository added as a
+  # trusted publisher there; until that is done the job would fail every
+  # release. See docs/RELEASING.md.
+  #
+  # pub-dev:
+  #   name: Publish to pub.dev
+  #   needs: verify
+  #   permissions:
+  #     id-token: write
+  #   uses: dart-lang/setup-dart/.github/workflows/publish.yml@v1

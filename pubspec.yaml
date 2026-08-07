@@ -1,0 +1,40 @@
+name: slate_ui
+description: >-
+  A compact Flutter widget kit for desktop tools: flat surfaces, hairline rules,
+  dense rows, one restrained accent, and controls that reveal their affordance
+  on hover.
+
+# Single source of truth for the package version. `tools/set_version.sh` reads
+# and writes it, and the release workflow checks the git tag against it.
+# See docs/RELEASING.md.
+version: 0.1.0
+
+repository: https://github.com/alpinsuite/ui-kit
+issue_tracker: https://github.com/alpinsuite/ui-kit/issues
+documentation: https://github.com/alpinsuite/ui-kit#readme
+
+topics:
+  - ui
+  - widgets
+  - desktop
+  - design-system
+  - theme
+
+# Matches the toolchain the kit is developed and tested against. It is also
+# what paint, the first consumer, builds with.
+environment:
+  sdk: ^3.12.2
+  flutter: ">=3.44.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+
+# No `flutter:` section on purpose: the kit ships no assets and no fonts. Icons
+# are drawn as paths (see SlateIcons) and the type is the platform's own, which
+# is what lets a consumer depend on this without pulling anything down.

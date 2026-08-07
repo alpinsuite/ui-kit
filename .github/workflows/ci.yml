@@ -1,0 +1,129 @@
+name: CI
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+  workflow_dispatch:
+
+# A new push to the same branch makes the in-flight run irrelevant.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  FLUTTER_VERSION: "3.44.8"
+
+jobs:
+  analyze:
+    name: Analyze and test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable
+          cache: true
+
+      - run: flutter pub get
+
+      - name: Check formatting
+        run: dart format --set-exit-if-changed .
+
+      - name: Analyze
+        run: flutter analyze --fatal-infos
+
+      - name: Check the kit is still liftable
+        # No application-specific imports, no dependency but Flutter, and an
+        # entrypoint that exports every source file exactly once. This is the
+        # property that let the kit be extracted in one piece; nothing but this
+        # check keeps it true.
+        run: bash tools/check_kit_purity.sh
+
+      - name: Test
+        run: flutter test --coverage
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: coverage
+          path: coverage/lcov.info
+          if-no-files-found: ignore
+
+  example:
+    name: Build and test the example
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable
+          cache: true
+
+      - name: Install Linux desktop build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            clang cmake ninja-build pkg-config libgtk-3-dev liblzma-dev
+
+      - run: flutter pub get
+        working-directory: example
+
+      - name: Analyze
+        run: flutter analyze --fatal-infos
+        working-directory: example
+
+      - name: Test
+        run: flutter test
+        working-directory: example
+
+      - name: Build
+        # The gallery is the only thing here that compiles the kit into a real
+        # binary. A widget test runs against the Flutter test shell and would
+        # not catch a break that only the desktop embedder sees.
+        run: flutter build linux --release
+        working-directory: example
+
+  package:
+    name: Check the package is publishable
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable
+          cache: true
+
+      - run: flutter pub get
+
+      - name: Publish dry run
+        # Catches the things that are only ever noticed at publish time: a
+        # missing licence, a description pub rejects, a file that should not
+        # ship. Running it on every change means a release never discovers them.
+        run: dart pub publish --dry-run
+
+      - name: Check the version is a plain semantic version
+        # A library resolved by pub must not carry a build number.
+        run: |
+          VERSION="$(bash tools/set_version.sh)"
+          echo "version is $VERSION"
+          if ! echo "$VERSION" | grep -qE '^[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.]+)?$'; then
+            echo "::error::pubspec version '$VERSION' is not a plain semantic version"
+            exit 1
+          fi
+
+      - name: Check the changelog documents this version
+        # A release whose notes are written at tag time is a release whose notes
+        # are written from the commit log.
+        run: |
+          VERSION="$(bash tools/set_version.sh)"
+          if ! grep -qE "^## \[($VERSION|Unreleased)\]" CHANGELOG.md; then
+            echo "::error::CHANGELOG.md has no [$VERSION] or [Unreleased] section"
+            exit 1
+          fi

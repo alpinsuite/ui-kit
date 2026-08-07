@@ -1,0 +1,38 @@
+# Kept out of the published archive.
+#
+# This file REPLACES .gitignore for publishing rather than adding to it, so it
+# has to restate the build-output patterns as well as its own exclusions.
+# Leaving them out ships the Dart build cache — tens of megabytes of .dill.
+
+# Build output and caches, in this package and in the example.
+.dart_tool/
+build/
+coverage/
+**/.dart_tool/
+**/build/
+
+# `docs/` and `tools/` are named for the repository, where they sit next to the
+# same directories in the application this kit came from. Pub's layout
+# convention is the singular `doc/` and `tool/`, and it fails a publish over the
+# difference — so the directories keep their names here and simply do not ship.
+# Neither is of any use to a consumer: one documents releasing this package, the
+# other runs its checks.
+#
+# README links into docs/ still resolve, because pub.dev rewrites relative links
+# against the `repository:` field in pubspec.yaml.
+docs/
+tools/
+
+# CI configuration is repository infrastructure, not part of the package.
+.github/
+
+# The gallery ships as source — it is the package's example — but its platform
+# scaffolding is generated and of no interest to anyone reading it.
+example/linux/
+example/.metadata
+
+# Editor and tooling leftovers.
+.idea/
+.vscode/
+*.iml
+*.log
