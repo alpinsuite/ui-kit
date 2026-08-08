@@ -134,4 +134,44 @@ void main() {
     expect(tester.takeException(), isNull);
     expect(find.byType(SingleChildScrollView), findsOneWidget);
   });
+
+  testWidgets('draws a leading glyph when a tab carries one', (tester) async {
+    await tester.pumpWidget(
+      wrap(
+        SlateTabStrip(
+          tabs: const <SlateTab>[
+            SlateTab(id: 'a', label: 'plain.pdf'),
+            SlateTab(id: 'b', label: 'locked.pdf', leading: SlateIcons.lock),
+          ],
+          selectedId: 'a',
+          onSelected: (_) {},
+        ),
+      ),
+    );
+    // One glyph, on the tab that asked for it.
+    expect(find.byType(SlateIcon), findsOneWidget);
+  });
+
+  testWidgets('a leading glyph does not change the tab height', (tester) async {
+    // A tab is a dense row with a fixed height; one taller than its
+    // neighbours is the whole reason this takes a glyph and not a widget.
+    await tester.pumpWidget(
+      wrap(
+        SlateTabStrip(
+          tabs: const <SlateTab>[
+            SlateTab(id: 'a', label: 'plain.pdf'),
+            SlateTab(id: 'b', label: 'locked.pdf', leading: SlateIcons.lock),
+          ],
+          selectedId: 'a',
+          onSelected: (_) {},
+        ),
+      ),
+    );
+    final heights = tester
+        .widgetList<Container>(find.byType(Container))
+        .map((c) => c.constraints?.maxHeight)
+        .whereType<double>()
+        .toSet();
+    expect(heights.length, lessThanOrEqualTo(1));
+  });
 }

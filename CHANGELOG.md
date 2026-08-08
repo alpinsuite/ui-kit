@@ -7,6 +7,51 @@ and the package uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.4.0] - 2026-08-08
+
+### Added
+
+- **`SlateActivityItem.enabled`** and **`SlateTab.leading`**, both added for
+  [AlpinSuite/pdf-ninja](https://github.com/AlpinSuite/pdf-ninja) and both
+  general.
+
+  A disabled activity item is dimmed and stays in the rail rather than being
+  dropped from it: a rail whose destinations come and go teaches the user that
+  the missing ones do not exist, and shifts the ones that remain out from under
+  the pointer already aimed at them. It is still announced to a screen reader,
+  as disabled.
+
+  `SlateTab.leading` is a glyph before the label for a state the label cannot
+  carry — locked, read-only, in error. Deliberately a `SlateIconDraw` and not a
+  widget: a tab is a dense row with a fixed height, and an arbitrary child is
+  how one tab ends up taller than its neighbours.
+
+- **`SlateTreeRow`** — a row in an outline: disclosure triangle, indent guides
+  and the selection and hover states. A leaf gets the indent without the
+  triangle rather than a blank where one would be, so the names still line up.
+
+- **`SlateDataGrid`, `SlateGridColumn` and `SlateGridController`** — the grid
+  primitives: a header row with draggable column edges, a body that scrolls
+  horizontally under it in lockstep, and virtualised rows.
+
+  Virtualised from the first version rather than as a later optimisation: a
+  grid that builds every row is a grid that has to be rewritten the first time
+  somebody opens a real document, and by then something else depends on the way
+  it was written.
+
+  The grid holds no data. It is told a row count and asked for a cell, which is
+  what keeps it from knowing whether it is showing tasks, pages or resources.
+
+  A visual change is an API change, so this is a minor bump rather than a patch.
+
+### Fixed
+
+- **`SlateActivityBar` overflowed instead of scrolling** when the window was
+  shorter than its own destinations. Unusual but reachable — a laptop in a
+  split workspace gets there — and the failure mode was the worst available: the
+  last destinations fall off the bottom with no way to reach them. The rail now
+  scrolls and the footer stays pinned.
+
 ## [0.3.0] - 2026-08-08
 
 ### Added

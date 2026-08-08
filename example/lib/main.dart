@@ -59,6 +59,8 @@ class _GalleryState extends State<_Gallery> {
   String _lastCommand = 'nothing yet';
   int _shellCategory = 1;
   String _shellTab = 'a';
+  int _gridRow = 2;
+  final Set<int> _collapsed = <int>{};
 
   @override
   void dispose() {
@@ -169,6 +171,10 @@ class _GalleryState extends State<_Gallery> {
                   _shell(theme),
                   SizedBox(height: theme.metrics.pad + 8),
 
+                  _section(theme, 'Grid'),
+                  _dataGrid(theme),
+                  SizedBox(height: theme.metrics.pad + 8),
+
                   _section(theme, 'Last command'),
                   Text(_lastCommand, style: theme.dimTextStyle),
                 ],
@@ -176,6 +182,62 @@ class _GalleryState extends State<_Gallery> {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  /// The grid with an outline in its first column, which is the shape every
+  /// consumer wants: a tree that also has columns.
+  Widget _dataGrid(SlateThemeData theme) {
+    const rows = <(int, String, String, bool)>[
+      (0, 'Groundworks', '12d', true),
+      (1, 'Excavate', '5d', false),
+      (1, 'Pour foundations', '7d', false),
+      (0, 'Superstructure', '20d', true),
+      (1, 'Frame', '12d', false),
+      (1, 'Roof', '8d', false),
+    ];
+
+    return Container(
+      height: 200,
+      decoration: BoxDecoration(
+        border: Border.all(color: theme.palette.border),
+      ),
+      child: SlateDataGrid(
+        columns: const <SlateGridColumn>[
+          SlateGridColumn(id: 'name', title: 'Name', width: 260),
+          SlateGridColumn(id: 'duration', title: 'Duration', width: 90),
+          SlateGridColumn(id: 'start', title: 'Start', width: 110),
+        ],
+        rowCount: rows.length,
+        onRowTap: (row) => setState(() => _gridRow = row),
+        isRowSelected: (row) => row == _gridRow,
+        rowSemanticLabel: (row) => rows[row].$2,
+        onColumnResized: (id, width) =>
+            setState(() => _lastCommand = '$id ${width.round()}'),
+        cellBuilder: (context, row, column) {
+          final (depth, name, duration, parent) = rows[row];
+          return switch (column.id) {
+            'name' => SlateTreeRow(
+              depth: depth,
+              expanded: parent ? !_collapsed.contains(row) : null,
+              onToggle: () => setState(
+                () => _collapsed.contains(row)
+                    ? _collapsed.remove(row)
+                    : _collapsed.add(row),
+              ),
+              child: Text(name, style: theme.textStyle),
+            ),
+            'duration' => Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 5),
+              child: Text(duration, style: theme.textStyle),
+            ),
+            _ => Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 5),
+              child: Text('06.01.2025', style: theme.dimTextStyle),
+            ),
+          };
+        },
       ),
     );
   }

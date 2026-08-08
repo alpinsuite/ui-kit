@@ -13,6 +13,7 @@ class SlateActivityItem {
     required this.icon,
     required this.tooltip,
     this.badge,
+    this.enabled = true,
   });
 
   final SlateIconDraw icon;
@@ -26,6 +27,14 @@ class SlateActivityItem {
   /// A string rather than an int so the caller owns the formatting, including
   /// what "more than ninety-nine" looks like in their language.
   final String? badge;
+
+  /// Whether the destination can be reached yet.
+  ///
+  /// A disabled item is drawn dimmed and stays in place rather than being
+  /// dropped from the list. A rail whose items come and go teaches the user
+  /// that the missing ones do not exist, and moves the ones that remain out
+  /// from under the pointer they had already aimed at.
+  final bool enabled;
 }
 
 /// The vertical icon rail down the side of the window.
@@ -70,13 +79,25 @@ class SlateActivityBar extends StatelessWidget {
       ),
       child: Column(
         children: <Widget>[
-          for (var i = 0; i < items.length; i++)
-            _ActivityButton(
-              item: items[i],
-              selected: i == selectedIndex,
-              onPressed: () => onSelected(i),
+          // Scrolls rather than overflowing. A window short enough to run out
+          // of rail is unusual but not impossible — a laptop in a split
+          // workspace reaches it — and a rail that overflows drops its last
+          // destinations off the bottom with no way to reach them.
+          Expanded(
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  for (var i = 0; i < items.length; i++)
+                    _ActivityButton(
+                      item: items[i],
+                      selected: i == selectedIndex,
+                      onPressed: () => onSelected(i),
+                    ),
+                ],
+              ),
             ),
-          const Spacer(),
+          ),
           for (var i = 0; i < footerItems.length; i++)
             _ActivityButton(
               item: footerItems[i],
@@ -116,15 +137,18 @@ class _ActivityButtonState extends State<_ActivityButton> {
     return Tooltip(
       message: widget.item.tooltip,
       child: MouseRegion(
-        cursor: SystemMouseCursors.click,
+        cursor: widget.item.enabled
+            ? SystemMouseCursors.click
+            : SystemMouseCursors.basic,
         onEnter: (_) => setState(() => _hover = true),
         onExit: (_) => setState(() => _hover = false),
         child: GestureDetector(
-          onTap: widget.onPressed,
+          onTap: widget.item.enabled ? widget.onPressed : null,
           child: Semantics(
             label: widget.item.tooltip,
             button: true,
             selected: widget.selected,
+            enabled: widget.item.enabled,
             child: SizedBox(
               width: width,
               height: width,
@@ -141,9 +165,9 @@ class _ActivityButtonState extends State<_ActivityButton> {
                     child: SlateIcon(
                       widget.item.icon,
                       size: theme.metrics.iconSize + 3,
-                      color: widget.selected
-                          ? palette.ink
-                          : _hover
+                      color: !widget.item.enabled
+                          ? palette.inkDim.withValues(alpha: 0.4)
+                          : widget.selected || _hover
                           ? palette.ink
                           : palette.inkDim,
                     ),

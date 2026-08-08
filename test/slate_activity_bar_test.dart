@@ -122,4 +122,56 @@ void main() {
       expect(propertiesFor(tester, label).selected, isFalse, reason: label);
     }
   });
+
+  testWidgets('a disabled item does not report a selection', (tester) async {
+    // It stays in the list rather than disappearing: a rail whose items come
+    // and go teaches the user the missing ones do not exist, and shifts the
+    // ones that remain out from under the pointer.
+    var selected = -1;
+    await tester.pumpWidget(
+      wrap(
+        SlateActivityBar(
+          items: const <SlateActivityItem>[
+            SlateActivityItem(icon: SlateIcons.eye, tooltip: 'View'),
+            SlateActivityItem(
+              icon: SlateIcons.pencil,
+              tooltip: 'Edit',
+              enabled: false,
+            ),
+          ],
+          selectedIndex: 0,
+          onSelected: (i) => selected = i,
+        ),
+      ),
+    );
+
+    await tester.tap(find.byType(SlateIcon).at(1));
+    expect(selected, -1, reason: 'the disabled item reported anyway');
+
+    await tester.tap(find.byType(SlateIcon).at(0));
+    expect(selected, 0);
+  });
+
+  testWidgets('a disabled item is still announced, and as disabled', (
+    tester,
+  ) async {
+    final handle = tester.ensureSemantics();
+    await tester.pumpWidget(
+      wrap(
+        SlateActivityBar(
+          items: const <SlateActivityItem>[
+            SlateActivityItem(
+              icon: SlateIcons.pencil,
+              tooltip: 'Edit',
+              enabled: false,
+            ),
+          ],
+          selectedIndex: -1,
+          onSelected: (_) {},
+        ),
+      ),
+    );
+    expect(find.bySemanticsLabel('Edit'), findsOneWidget);
+    handle.dispose();
+  });
 }

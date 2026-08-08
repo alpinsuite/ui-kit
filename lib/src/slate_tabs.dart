@@ -11,6 +11,7 @@ class SlateTab {
     required this.label,
     this.modified = false,
     this.tooltip,
+    this.leading,
   });
 
   /// Identifies the tab to the caller. The strip never interprets it.
@@ -24,6 +25,14 @@ class SlateTab {
 
   /// Usually the full path, where the label is only the file name.
   final String? tooltip;
+
+  /// A small glyph before the label, for a state the label cannot carry:
+  /// locked, read-only, in error.
+  ///
+  /// Deliberately a glyph rather than a widget. A tab is a dense row with a
+  /// fixed height, and letting the caller put arbitrary content in it is how
+  /// one tab ends up taller than its neighbours.
+  final SlateIconDraw? leading;
 }
 
 /// The row of document tabs across the top of the main view.
@@ -209,6 +218,10 @@ class _TabState extends State<_Tab> {
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: <Widget>[
+                  if (widget.tab.leading case final leading?) ...<Widget>[
+                    SlateIcon(leading, size: 12, color: palette.inkDim),
+                    SizedBox(width: theme.metrics.gap / 2),
+                  ],
                   Flexible(
                     child: Text(
                       widget.tab.label,

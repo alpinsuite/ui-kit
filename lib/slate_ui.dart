@@ -22,6 +22,7 @@ library;
 
 export 'src/slate_activity_bar.dart';
 export 'src/slate_controls.dart';
+export 'src/slate_data_grid.dart';
 export 'src/slate_dialog.dart';
 export 'src/slate_icons.dart';
 export 'src/slate_menu.dart';
@@ -33,3 +34,4 @@ export 'src/slate_split_view.dart';
 export 'src/slate_status_bar.dart';
 export 'src/slate_tabs.dart';
 export 'src/slate_theme.dart';
+export 'src/slate_tree_row.dart';
