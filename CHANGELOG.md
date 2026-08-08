@@ -7,6 +7,8 @@ and the package uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-08-08
+
 ### Added
 
 - **24 glyphs on `SlateIcons`**, taking the set from 23 to 47. Drawn for
