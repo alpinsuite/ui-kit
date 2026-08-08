@@ -24,7 +24,14 @@ void main() {
     await tester.pumpWidget(const GalleryApp());
     await tester.pumpAndSettle();
 
-    await tester.tap(find.text('Open a dialog'));
+    // The button sits below the fold of the 800x600 test viewport, and moves
+    // further down every time the kit gains a glyph — the icon section above it
+    // is a Wrap. Tapping a finder that is off-screen silently misses.
+    final openDialog = find.text('Open a dialog');
+    await tester.ensureVisible(openDialog);
+    await tester.pumpAndSettle();
+
+    await tester.tap(openDialog);
     await tester.pumpAndSettle();
     expect(find.text('Resize Image'), findsOneWidget);
 

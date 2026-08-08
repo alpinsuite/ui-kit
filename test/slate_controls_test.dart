@@ -317,6 +317,37 @@ void main() {
   });
 
   group('SlateField', () {
+    testWidgets('obscures its text and turns off suggestions with it', (
+      tester,
+    ) async {
+      // A password field that hides its characters while offering to remember
+      // them is worse than one that does neither.
+      final controller = TextEditingController(text: 'hunter2');
+      addTearDown(controller.dispose);
+
+      await tester.pumpWidget(
+        wrap(SlateField(controller: controller, obscureText: true)),
+      );
+
+      final field = tester.widget<TextField>(find.byType(TextField));
+      expect(field.obscureText, isTrue);
+      expect(field.enableSuggestions, isFalse);
+      expect(field.autocorrect, isFalse);
+    });
+
+    testWidgets('shows its text by default', (tester) async {
+      final controller = TextEditingController(text: 'visible');
+      addTearDown(controller.dispose);
+
+      await tester.pumpWidget(wrap(SlateField(controller: controller)));
+      expect(
+        tester.widget<TextField>(find.byType(TextField)).obscureText,
+        isFalse,
+      );
+    });
+  });
+
+  group('SlateField', () {
     testWidgets('edits its controller and reports changes', (tester) async {
       final controller = TextEditingController(text: 'start');
       addTearDown(controller.dispose);

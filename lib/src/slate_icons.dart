@@ -283,6 +283,378 @@ abstract final class SlateIcons {
     canvas.drawCircle(const Offset(6, 6), 1, dot);
     canvas.drawCircle(const Offset(9.6, 5.4), 1, dot);
   }
+
+  // Navigation.
+
+  static void chevronLeft(Canvas canvas, Paint stroke) {
+    canvas.drawPath(
+      Path()
+        ..moveTo(9.5, 4.5)
+        ..lineTo(6, 8)
+        ..lineTo(9.5, 11.5),
+      stroke,
+    );
+  }
+
+  static void arrowLeft(Canvas canvas, Paint stroke) {
+    canvas
+      ..drawLine(const Offset(13, 8), const Offset(3, 8), stroke)
+      ..drawPath(
+        Path()
+          ..moveTo(7, 4)
+          ..lineTo(3, 8)
+          ..lineTo(7, 12),
+        stroke,
+      );
+  }
+
+  static void arrowRight(Canvas canvas, Paint stroke) {
+    canvas
+      ..drawLine(const Offset(3, 8), const Offset(13, 8), stroke)
+      ..drawPath(
+        Path()
+          ..moveTo(9, 4)
+          ..lineTo(13, 8)
+          ..lineTo(9, 12),
+        stroke,
+      );
+  }
+
+  /// An arrow doubling back on itself.
+  static void undo(Canvas canvas, Paint stroke) {
+    canvas
+      ..drawPath(
+        Path()
+          ..moveTo(6, 4.5)
+          ..lineTo(2.8, 7.5)
+          ..lineTo(6, 10.5),
+        stroke,
+      )
+      ..drawPath(
+        Path()
+          ..moveTo(2.8, 7.5)
+          ..lineTo(9.3, 7.5)
+          ..cubicTo(12.8, 7.5, 12.8, 13, 8.8, 13),
+        stroke,
+      );
+  }
+
+  static void redo(Canvas canvas, Paint stroke) {
+    canvas
+      ..drawPath(
+        Path()
+          ..moveTo(10, 4.5)
+          ..lineTo(13.2, 7.5)
+          ..lineTo(10, 10.5),
+        stroke,
+      )
+      ..drawPath(
+        Path()
+          ..moveTo(13.2, 7.5)
+          ..lineTo(6.7, 7.5)
+          ..cubicTo(3.2, 7.5, 3.2, 13, 7.2, 13),
+        stroke,
+      );
+  }
+
+  // Zoom. The magnifier is [search]'s, so the three read as one family.
+
+  static void zoomIn(Canvas canvas, Paint stroke) {
+    canvas
+      ..drawCircle(const Offset(7, 7), 4, stroke)
+      ..drawLine(const Offset(10, 10), const Offset(13.5, 13.5), stroke)
+      ..drawLine(const Offset(4.9, 7), const Offset(9.1, 7), stroke)
+      ..drawLine(const Offset(7, 4.9), const Offset(7, 9.1), stroke);
+  }
+
+  static void zoomOut(Canvas canvas, Paint stroke) {
+    canvas
+      ..drawCircle(const Offset(7, 7), 4, stroke)
+      ..drawLine(const Offset(10, 10), const Offset(13.5, 13.5), stroke)
+      ..drawLine(const Offset(4.9, 7), const Offset(9.1, 7), stroke);
+  }
+
+  // Panels and layout.
+
+  /// A frame with a rule near one edge: a collapsible side panel.
+  static void sidebar(Canvas canvas, Paint stroke) {
+    canvas
+      ..drawRect(const Rect.fromLTWH(2.5, 3.5, 11, 9), stroke)
+      ..drawLine(const Offset(6.5, 3.5), const Offset(6.5, 12.5), stroke);
+  }
+
+  /// Four tiles: a thumbnail grid. Not `grid`, which is the 16-unit
+  /// authoring grid every glyph is drawn against.
+  static void tiles(Canvas canvas, Paint stroke) {
+    canvas
+      ..drawRect(const Rect.fromLTWH(2.5, 2.5, 5, 5), stroke)
+      ..drawRect(const Rect.fromLTWH(8.5, 2.5, 5, 5), stroke)
+      ..drawRect(const Rect.fromLTWH(2.5, 8.5, 5, 5), stroke)
+      ..drawRect(const Rect.fromLTWH(8.5, 8.5, 5, 5), stroke);
+  }
+
+  /// Bulleted rows: an outline or a list of items.
+  static void list(Canvas canvas, Paint stroke) {
+    final dot = Paint()
+      ..color = stroke.color
+      ..style = PaintingStyle.fill;
+    for (final y in const <double>[4.5, 8, 11.5]) {
+      canvas
+        ..drawCircle(Offset(3.6, y), 0.9, dot)
+        ..drawLine(Offset(6.4, y), Offset(13, y), stroke);
+    }
+  }
+
+  // Page operations.
+
+  static void rotateRight(Canvas canvas, Paint stroke) {
+    canvas
+      ..drawPath(
+        Path()..addArc(
+          const Rect.fromLTWH(3, 3, 10, 10),
+          -math.pi * 0.35,
+          math.pi * 1.7,
+        ),
+        stroke,
+      )
+      ..drawPath(
+        Path()
+          ..moveTo(9.9, 2.4)
+          ..lineTo(13.3, 4.4)
+          ..lineTo(10.2, 6.7),
+        stroke,
+      );
+  }
+
+  static void rotateLeft(Canvas canvas, Paint stroke) {
+    canvas
+      ..drawPath(
+        Path()..addArc(
+          const Rect.fromLTWH(3, 3, 10, 10),
+          math.pi * 1.35,
+          -math.pi * 1.7,
+        ),
+        stroke,
+      )
+      ..drawPath(
+        Path()
+          ..moveTo(6.1, 2.4)
+          ..lineTo(2.7, 4.4)
+          ..lineTo(5.8, 6.7),
+        stroke,
+      );
+  }
+
+  static void trash(Canvas canvas, Paint stroke) {
+    canvas
+      ..drawLine(const Offset(2.5, 4.5), const Offset(13.5, 4.5), stroke)
+      ..drawPath(
+        Path()
+          ..moveTo(6, 4.5)
+          ..lineTo(6, 2.8)
+          ..lineTo(10, 2.8)
+          ..lineTo(10, 4.5),
+        stroke,
+      )
+      ..drawPath(
+        Path()
+          ..moveTo(4.1, 4.5)
+          ..lineTo(4.9, 13.2)
+          ..lineTo(11.1, 13.2)
+          ..lineTo(11.9, 4.5),
+        stroke,
+      )
+      ..drawLine(const Offset(6.7, 6.9), const Offset(6.9, 11.1), stroke)
+      ..drawLine(const Offset(9.3, 6.9), const Offset(9.1, 11.1), stroke);
+  }
+
+  /// A sheet with a folded corner.
+  static void file(Canvas canvas, Paint stroke) {
+    canvas
+      ..drawPath(
+        Path()
+          ..moveTo(3.5, 2.5)
+          ..lineTo(9.5, 2.5)
+          ..lineTo(12.5, 5.5)
+          ..lineTo(12.5, 13.5)
+          ..lineTo(3.5, 13.5)
+          ..close(),
+        stroke,
+      )
+      ..drawPath(
+        Path()
+          ..moveTo(9.5, 2.5)
+          ..lineTo(9.5, 5.5)
+          ..lineTo(12.5, 5.5),
+        stroke,
+      );
+  }
+
+  static void folder(Canvas canvas, Paint stroke) {
+    canvas.drawPath(
+      Path()
+        ..moveTo(2.5, 12.5)
+        ..lineTo(2.5, 3.5)
+        ..lineTo(6.4, 3.5)
+        ..lineTo(7.9, 5.5)
+        ..lineTo(13.5, 5.5)
+        ..lineTo(13.5, 12.5)
+        ..close(),
+      stroke,
+    );
+  }
+
+  /// A diskette. Deliberately not the arrow-into-a-tray of [download], which
+  /// already means "something newer is available" in this set.
+  static void save(Canvas canvas, Paint stroke) {
+    canvas
+      ..drawPath(
+        Path()
+          ..moveTo(3, 12.8)
+          ..lineTo(3, 3.2)
+          ..lineTo(10.6, 3.2)
+          ..lineTo(13, 5.6)
+          ..lineTo(13, 12.8)
+          ..close(),
+        stroke,
+      )
+      ..drawRect(const Rect.fromLTWH(5.6, 3.2, 4.6, 3.1), stroke)
+      ..drawRect(const Rect.fromLTWH(5.2, 9, 5.6, 3.8), stroke);
+  }
+
+  static void print(Canvas canvas, Paint stroke) {
+    canvas
+      ..drawPath(
+        Path()
+          ..moveTo(4.5, 6.2)
+          ..lineTo(4.5, 2.5)
+          ..lineTo(11.5, 2.5)
+          ..lineTo(11.5, 6.2),
+        stroke,
+      )
+      ..drawPath(
+        Path()
+          ..moveTo(4.5, 11.2)
+          ..lineTo(2.5, 11.2)
+          ..lineTo(2.5, 6.2)
+          ..lineTo(13.5, 6.2)
+          ..lineTo(13.5, 11.2)
+          ..lineTo(11.5, 11.2),
+        stroke,
+      )
+      ..drawRect(const Rect.fromLTWH(4.5, 9.4, 7, 4.1), stroke);
+  }
+
+  // State.
+
+  static void lock(Canvas canvas, Paint stroke) {
+    canvas
+      ..drawRect(const Rect.fromLTWH(3.5, 7.2, 9, 6.3), stroke)
+      ..drawPath(
+        Path()
+          ..moveTo(5.6, 7.2)
+          ..lineTo(5.6, 5.6)
+          ..arcToPoint(
+            const Offset(10.4, 5.6),
+            radius: const Radius.circular(2.4),
+          )
+          ..lineTo(10.4, 7.2),
+        stroke,
+      );
+  }
+
+  static void info(Canvas canvas, Paint stroke) {
+    canvas
+      ..drawCircle(const Offset(8, 8), 5.5, stroke)
+      ..drawLine(const Offset(8, 7.2), const Offset(8, 11.2), stroke)
+      ..drawCircle(
+        const Offset(8, 4.9),
+        0.85,
+        Paint()
+          ..color = stroke.color
+          ..style = PaintingStyle.fill,
+      );
+  }
+
+  // Editing.
+
+  static void pencil(Canvas canvas, Paint stroke) {
+    canvas
+      ..drawPath(
+        Path()
+          ..moveTo(2.8, 13.2)
+          ..lineTo(3.9, 9.9)
+          ..lineTo(10.6, 3.2)
+          ..lineTo(12.8, 5.4)
+          ..lineTo(6.1, 12.1)
+          ..close(),
+        stroke,
+      )
+      ..drawLine(const Offset(9.5, 4.3), const Offset(11.7, 6.5), stroke);
+  }
+
+  /// Stacked sheets seen at an angle: combining several things into one.
+  static void layers(Canvas canvas, Paint stroke) {
+    canvas
+      ..drawPath(
+        Path()
+          ..moveTo(8, 2)
+          ..lineTo(13.5, 5)
+          ..lineTo(8, 8)
+          ..lineTo(2.5, 5)
+          ..close(),
+        stroke,
+      )
+      ..drawPath(
+        Path()
+          ..moveTo(2.5, 8)
+          ..lineTo(8, 11)
+          ..lineTo(13.5, 8),
+        stroke,
+      )
+      ..drawPath(
+        Path()
+          ..moveTo(2.5, 11)
+          ..lineTo(8, 14)
+          ..lineTo(13.5, 11),
+        stroke,
+      );
+  }
+
+  static void eye(Canvas canvas, Paint stroke) {
+    canvas
+      ..drawPath(
+        Path()
+          ..moveTo(1.8, 8)
+          ..quadraticBezierTo(8, 2.6, 14.2, 8)
+          ..quadraticBezierTo(8, 13.4, 1.8, 8)
+          ..close(),
+        stroke,
+      )
+      ..drawCircle(const Offset(8, 8), 2.2, stroke);
+  }
+
+  /// A written mark over a rule.
+  static void signature(Canvas canvas, Paint stroke) {
+    canvas
+      ..drawPath(
+        Path()
+          ..moveTo(3, 10.8)
+          ..cubicTo(4.5, 3.2, 6.6, 2.4, 6.9, 5.6)
+          ..cubicTo(7.2, 9, 4.8, 11.2, 6.4, 10.2)
+          ..cubicTo(8.2, 9.1, 9.6, 6.6, 12.8, 6.6),
+        stroke,
+      )
+      ..drawLine(const Offset(2.5, 13.2), const Offset(13.5, 13.2), stroke);
+  }
+
+  /// An I-beam: the text selection tool.
+  static void textCursor(Canvas canvas, Paint stroke) {
+    canvas
+      ..drawLine(const Offset(8, 3.5), const Offset(8, 12.5), stroke)
+      ..drawLine(const Offset(6, 3.5), const Offset(10, 3.5), stroke)
+      ..drawLine(const Offset(6, 12.5), const Offset(10, 12.5), stroke);
+  }
 }
 
 /// Renders a [SlateIconDraw] at a given size and colour.

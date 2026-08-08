@@ -443,6 +443,7 @@ class SlateField extends StatelessWidget {
     this.focusNode,
     this.autofocus = false,
     this.hint,
+    this.obscureText = false,
     super.key,
   });
 
@@ -455,6 +456,12 @@ class SlateField extends StatelessWidget {
   final FocusNode? focusNode;
   final bool autofocus;
   final String? hint;
+
+  /// Replaces what is typed with dots, and turns off the platform's own
+  /// suggestion and autofill machinery along with it — a password field that
+  /// hides its characters while offering to remember them is worse than one
+  /// that does neither.
+  final bool obscureText;
 
   @override
   Widget build(BuildContext context) {
@@ -471,6 +478,9 @@ class SlateField extends StatelessWidget {
         onSubmitted: onSubmitted,
         textAlign: textAlign,
         inputFormatters: inputFormatters,
+        obscureText: obscureText,
+        enableSuggestions: !obscureText,
+        autocorrect: !obscureText,
         cursorWidth: 1,
         cursorColor: palette.accent,
         style: theme.textStyle.copyWith(fontSize: theme.metrics.smallFontSize),

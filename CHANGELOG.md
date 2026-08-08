@@ -7,6 +7,33 @@ and the package uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+
+- **24 glyphs on `SlateIcons`**, taking the set from 23 to 47. Drawn for
+  [AlpinSuite/pdf-ninja](https://github.com/AlpinSuite/pdf-ninja), the kit's
+  second consumer, but none of them knows what a PDF is — they are the
+  vocabulary any document-shaped desktop tool needs, and the set had visible
+  gaps without them (`chevronLeft` had no partner to its three siblings).
+  - Navigation: `chevronLeft`, `arrowLeft`, `arrowRight`, `undo`, `redo`.
+  - Zoom: `zoomIn`, `zoomOut`, built on `search`'s magnifier so the three read
+    as one family.
+  - Panels: `sidebar`, `tiles`, `list`.
+  - Documents: `file`, `folder`, `save`, `print`, `trash`, `rotateLeft`,
+    `rotateRight`.
+  - State and editing: `lock`, `info`, `pencil`, `layers`, `eye`, `signature`,
+    `textCursor`.
+
+  A visual change is an API change, so this is a minor bump rather than a patch.
+
+- **`SlateField.obscureText`**, which also turns off the platform's suggestion
+  and autofill machinery. A password field that hides its characters while
+  offering to remember them is worse than one that does neither, so the two are
+  one flag rather than three.
+
+  Note that the thumbnail-grid glyph is `tiles`, not `grid`: `SlateIcons.grid`
+  is the 16-unit authoring grid every glyph is drawn against, and the two cannot
+  both have the name.
+
 ## [0.1.0] - 2026-08-07
 
 First release. The kit was extracted unchanged from
