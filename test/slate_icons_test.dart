@@ -54,6 +54,19 @@ const Map<String, SlateIconDraw> _glyphs = <String, SlateIconDraw>{
   'eye': SlateIcons.eye,
   'signature': SlateIcons.signature,
   'textCursor': SlateIcons.textCursor,
+  'calendar': SlateIcons.calendar,
+  'gantt': SlateIcons.gantt,
+  'milestone': SlateIcons.milestone,
+  'resource': SlateIcons.resource,
+  'baseline': SlateIcons.baseline,
+  'warning': SlateIcons.warning,
+  'report': SlateIcons.report,
+  'settings': SlateIcons.settings,
+  'link': SlateIcons.link,
+  'filter': SlateIcons.filter,
+  'indentIncrease': SlateIcons.indentIncrease,
+  'indentDecrease': SlateIcons.indentDecrease,
+  'criticalPath': SlateIcons.criticalPath,
 };
 
 void main() {

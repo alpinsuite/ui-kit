@@ -18,6 +18,9 @@ class SlateMetrics {
     this.buttonHeight = 23,
     this.barHeight = 30,
     this.windowBarHeight = 36,
+    this.activityBarWidth = 48,
+    this.tabHeight = 32,
+    this.splitterHitExtent = 7,
     this.fontSize = 13,
     this.smallFontSize = 12,
     this.iconSize = 15,
@@ -50,6 +53,21 @@ class SlateMetrics {
   /// The merged title and menu row.
   final double windowBarHeight;
 
+  /// The icon rail down the side of the window.
+  final double activityBarWidth;
+
+  /// A document tab. Taller than a bar row: it carries a label and a close
+  /// button, and it is a target the user aims at rather than reads.
+  final double tabHeight;
+
+  /// How wide a split divider is to the *pointer*.
+  ///
+  /// The divider is drawn as a hairline, because a visible bar between two
+  /// panes is noise. A hairline is also impossible to hit, so the grab area is
+  /// this much wider and invisible — the usual gap between what a control looks
+  /// like and what it is.
+  final double splitterHitExtent;
+
   final double fontSize;
   final double smallFontSize;
   final double iconSize;
@@ -74,6 +92,11 @@ class SlateMetrics {
       buttonHeight: buttonHeight * factor,
       barHeight: barHeight * factor,
       windowBarHeight: windowBarHeight * factor,
+      activityBarWidth: activityBarWidth * factor,
+      tabHeight: tabHeight * factor,
+      // Deliberately not scaled: this is a pointer target, and a pointer does
+      // not get smaller because the interface is dense.
+      splitterHitExtent: splitterHitExtent,
       fontSize: fontSize * factor,
       smallFontSize: smallFontSize * factor,
       iconSize: iconSize * factor,

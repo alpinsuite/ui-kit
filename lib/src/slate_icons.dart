@@ -655,6 +655,175 @@ abstract final class SlateIcons {
       ..drawLine(const Offset(6, 3.5), const Offset(10, 3.5), stroke)
       ..drawLine(const Offset(6, 12.5), const Offset(10, 12.5), stroke);
   }
+
+  // Planning and scheduling. A tool that shows work over time needs a vocabulary
+  // for it, and these are the nouns: a calendar, bars on a timeline, a
+  // milestone, a person to do the work, a baseline to compare against.
+
+  /// A month grid: the working-time editor.
+  static void calendar(Canvas canvas, Paint stroke) {
+    canvas
+      ..drawRect(const Rect.fromLTRB(2.5, 3.5, 13.5, 13.5), stroke)
+      ..drawLine(const Offset(2.5, 6.5), const Offset(13.5, 6.5), stroke)
+      ..drawLine(const Offset(5.5, 2), const Offset(5.5, 5), stroke)
+      ..drawLine(const Offset(10.5, 2), const Offset(10.5, 5), stroke);
+  }
+
+  /// Bars staggered across a timeline.
+  static void gantt(Canvas canvas, Paint stroke) {
+    canvas
+      ..drawLine(const Offset(3, 4.5), const Offset(10, 4.5), stroke)
+      ..drawLine(const Offset(6, 8), const Offset(13, 8), stroke)
+      ..drawLine(const Offset(3, 11.5), const Offset(9, 11.5), stroke);
+  }
+
+  /// The diamond a zero-duration task is drawn as.
+  static void milestone(Canvas canvas, Paint stroke) {
+    canvas.drawPath(
+      Path()
+        ..moveTo(8, 2.8)
+        ..lineTo(13.2, 8)
+        ..lineTo(8, 13.2)
+        ..lineTo(2.8, 8)
+        ..close(),
+      stroke,
+    );
+  }
+
+  /// A person: the work resource.
+  static void resource(Canvas canvas, Paint stroke) {
+    canvas
+      ..drawCircle(const Offset(8, 5.8), 2.6, stroke)
+      ..drawPath(
+        Path()
+          ..moveTo(2.8, 13.4)
+          ..quadraticBezierTo(8, 9.2, 13.2, 13.4),
+        stroke,
+      );
+  }
+
+  /// Two offset bars: the plan against the baseline it is measured from.
+  static void baseline(Canvas canvas, Paint stroke) {
+    canvas
+      ..drawRect(const Rect.fromLTWH(2.5, 3.8, 9, 3.4), stroke)
+      ..drawRect(const Rect.fromLTWH(5, 8.8, 9, 3.4), stroke);
+  }
+
+  /// A triangle and a bang: something in the plan does not add up.
+  static void warning(Canvas canvas, Paint stroke) {
+    canvas
+      ..drawPath(
+        Path()
+          ..moveTo(8, 2.6)
+          ..lineTo(14.2, 13.4)
+          ..lineTo(1.8, 13.4)
+          ..close(),
+        stroke,
+      )
+      ..drawLine(const Offset(8, 6.6), const Offset(8, 9.8), stroke)
+      ..drawLine(const Offset(8, 11.4), const Offset(8, 11.7), stroke);
+  }
+
+  /// A sheet with a chart on it.
+  static void report(Canvas canvas, Paint stroke) {
+    canvas
+      ..drawRect(const Rect.fromLTRB(3, 2.5, 13, 13.5), stroke)
+      ..drawLine(const Offset(5.5, 10.8), const Offset(5.5, 8), stroke)
+      ..drawLine(const Offset(8, 10.8), const Offset(8, 5.6), stroke)
+      ..drawLine(const Offset(10.5, 10.8), const Offset(10.5, 7), stroke);
+  }
+
+  /// A cog: preferences.
+  static void settings(Canvas canvas, Paint stroke) {
+    canvas.drawCircle(const Offset(8, 8), 2.4, stroke);
+    for (var i = 0; i < 8; i++) {
+      final angle = i * math.pi / 4;
+      final dx = math.cos(angle);
+      final dy = math.sin(angle);
+      canvas.drawLine(
+        Offset(8 + dx * 4.1, 8 + dy * 4.1),
+        Offset(8 + dx * 5.9, 8 + dy * 5.9),
+        stroke,
+      );
+    }
+  }
+
+  /// Two chain links: the dependency between two tasks.
+  static void link(Canvas canvas, Paint stroke) {
+    canvas
+      ..drawRRect(
+        RRect.fromRectAndRadius(
+          const Rect.fromLTWH(2.2, 6, 7.2, 4),
+          const Radius.circular(2),
+        ),
+        stroke,
+      )
+      ..drawRRect(
+        RRect.fromRectAndRadius(
+          const Rect.fromLTWH(6.6, 6, 7.2, 4),
+          const Radius.circular(2),
+        ),
+        stroke,
+      );
+  }
+
+  /// A funnel: narrowing a list to what matters.
+  static void filter(Canvas canvas, Paint stroke) {
+    canvas.drawPath(
+      Path()
+        ..moveTo(2.5, 3.2)
+        ..lineTo(13.5, 3.2)
+        ..lineTo(9.2, 8.4)
+        ..lineTo(9.2, 13.2)
+        ..lineTo(6.8, 11.8)
+        ..lineTo(6.8, 8.4)
+        ..close(),
+      stroke,
+    );
+  }
+
+  /// Push a row one level deeper in an outline.
+  static void indentIncrease(Canvas canvas, Paint stroke) {
+    _indent(canvas, stroke, pointingRight: true);
+  }
+
+  /// Pull a row one level out of an outline.
+  static void indentDecrease(Canvas canvas, Paint stroke) {
+    _indent(canvas, stroke, pointingRight: false);
+  }
+
+  static void _indent(
+    Canvas canvas,
+    Paint stroke, {
+    required bool pointingRight,
+  }) {
+    canvas
+      ..drawLine(const Offset(2.5, 3.5), const Offset(13.5, 3.5), stroke)
+      ..drawLine(const Offset(7, 8), const Offset(13.5, 8), stroke)
+      ..drawLine(const Offset(2.5, 12.5), const Offset(13.5, 12.5), stroke)
+      ..drawPath(
+        pointingRight
+            ? (Path()
+                ..moveTo(2.5, 5.8)
+                ..lineTo(4.9, 8)
+                ..lineTo(2.5, 10.2))
+            : (Path()
+                ..moveTo(4.9, 5.8)
+                ..lineTo(2.5, 8)
+                ..lineTo(4.9, 10.2)),
+        stroke,
+      );
+  }
+
+  /// The longest path through a network, drawn as nodes on a run.
+  static void criticalPath(Canvas canvas, Paint stroke) {
+    canvas
+      ..drawLine(const Offset(4.2, 11.6), const Offset(7.6, 7.6), stroke)
+      ..drawLine(const Offset(8.4, 6.8), const Offset(11.6, 4.4), stroke)
+      ..drawCircle(const Offset(3.2, 12.5), 1.3, stroke)
+      ..drawCircle(const Offset(8, 7.2), 1.3, stroke)
+      ..drawCircle(const Offset(12.6, 3.6), 1.3, stroke);
+  }
 }
 
 /// Renders a [SlateIconDraw] at a given size and colour.

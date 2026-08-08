@@ -7,6 +7,51 @@ and the package uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-08-08
+
+### Added
+
+- **The window shell.** Five widgets that every desktop tool in the suite needs
+  and none of which knows what an application is: what they switch to, what a
+  tab holds and what a status segment counts are all the caller's business.
+  - **`SlateActivityBar`** and **`SlateActivityItem`** — the icon rail. Reports
+    an index; marks the current destination with an accent rule down its
+    leading edge. Secondary destinations pin to the bottom and are indexed
+    separately, because they are a different list rather than a continuation of
+    the first. `SlateActivityItem.badge` is a `String`, not an `int`, so the
+    caller owns what "more than ninety-nine" looks like in their language.
+  - **`SlateSplitView`** — a draggable divider with a minimum extent for each
+    pane. The position is a *fraction of the space the panes share*, so a
+    persisted layout survives a resize, and both minimums are honoured exactly
+    rather than to within the divider's own width. Pass `fraction` to drive it
+    from outside; `onFractionChanged` fires continuously so a caller that
+    persists the layout can debounce.
+  - **`SlateSidePanel`** — a titled panel with a slot for header actions.
+  - **`SlateTabStrip`** and **`SlateTab`** — document tabs that scroll rather
+    than collapsing into a menu, because a tab that has silently vanished is
+    worse than one you have to scroll to. The modified dot becomes the close
+    button on hover, so the two never compete for the same corner.
+  - **`SlateStatusBar`** and **`SlateStatusItem`** — bottom segments, clickable
+    when given a handler. A count of problems that jumps to the problems is
+    worth having; a count that just sits there is not.
+
+- **13 glyphs on `SlateIcons`**, taking the set from 47 to 60: `calendar`,
+  `gantt`, `milestone`, `resource`, `baseline`, `warning`, `report`,
+  `settings`, `link`, `filter`, `indentIncrease`, `indentDecrease`,
+  `criticalPath`. Drawn for
+  [AlpinSuite/fluid-plan](https://github.com/AlpinSuite/fluid-plan), but none
+  of them knows what a project plan is — they are the vocabulary any tool that
+  shows work over time needs.
+
+- **`SlateMetrics.activityBarWidth`, `.tabHeight` and `.splitterHitExtent`.**
+  The last is the width of a split divider *to the pointer*: the divider is
+  drawn as a hairline because a visible bar between two panes is noise, and a
+  hairline is impossible to hit. It is deliberately not scaled by
+  `SlateMetrics.scaled`, because a pointer does not get smaller when the
+  interface gets denser.
+
+  A visual change is an API change, so this is a minor bump rather than a patch.
+
 ## [0.2.0] - 2026-08-08
 
 ### Added

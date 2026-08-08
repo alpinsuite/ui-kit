@@ -1,0 +1,125 @@
+import 'package:flutter/material.dart';
+import 'package:flutter/semantics.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:slate_ui/slate_ui.dart';
+
+import 'slate_test_harness.dart';
+
+List<SlateActivityItem> items() => <SlateActivityItem>[
+  const SlateActivityItem(icon: SlateIcons.list, tooltip: 'Tasks'),
+  const SlateActivityItem(icon: SlateIcons.gantt, tooltip: 'Gantt'),
+  const SlateActivityItem(
+    icon: SlateIcons.warning,
+    tooltip: 'Conflicts',
+    badge: '3',
+  ),
+];
+
+Widget bar({
+  int selected = 0,
+  ValueChanged<int>? onSelected,
+  List<SlateActivityItem> footer = const <SlateActivityItem>[],
+  ValueChanged<int>? onFooter,
+}) => SizedBox(
+  height: 400,
+  child: SlateActivityBar(
+    items: items(),
+    selectedIndex: selected,
+    onSelected: onSelected ?? (_) {},
+    footerItems: footer,
+    onFooterSelected: onFooter,
+  ),
+);
+
+/// The [Semantics] a destination declares.
+///
+/// Read off the widget rather than the rendered tree: `getSemantics` on a
+/// tooltip finder walks up to the nearest node, which is the root, and the
+/// assertion then passes or fails for reasons unrelated to the bar.
+SemanticsProperties propertiesFor(WidgetTester tester, String label) {
+  return tester
+      .widget<Semantics>(
+        find.byWidgetPredicate(
+          (w) =>
+              w is Semantics &&
+              w.properties.label == label &&
+              w.properties.button == true,
+        ),
+      )
+      .properties;
+}
+
+void main() {
+  testWidgets('is exactly the width the metrics say', (tester) async {
+    await tester.pumpWidget(wrap(bar()));
+    expect(
+      tester.getSize(find.byType(SlateActivityBar)).width,
+      const SlateMetrics().activityBarWidth,
+    );
+  });
+
+  testWidgets('reports the index that was tapped', (tester) async {
+    final tapped = <int>[];
+    await tester.pumpWidget(wrap(bar(onSelected: tapped.add)));
+
+    await tester.tap(find.byTooltip('Gantt'));
+    await tester.pump();
+    expect(tapped, <int>[1]);
+  });
+
+  testWidgets('marks the selected destination with an accent rule', (
+    tester,
+  ) async {
+    await tester.pumpWidget(wrap(bar(selected: 1)));
+
+    expect(propertiesFor(tester, 'Gantt').selected, isTrue);
+    expect(propertiesFor(tester, 'Tasks').selected, isFalse);
+  });
+
+  testWidgets('every destination carries its name for a screen reader', (
+    tester,
+  ) async {
+    final handle = tester.ensureSemantics();
+    await tester.pumpWidget(wrap(bar()));
+
+    for (final label in <String>['Tasks', 'Gantt', 'Conflicts']) {
+      expect(find.byTooltip(label), findsOneWidget, reason: label);
+    }
+    handle.dispose();
+  });
+
+  testWidgets('draws the badge text it was given', (tester) async {
+    await tester.pumpWidget(wrap(bar()));
+    expect(find.text('3'), findsOneWidget);
+  });
+
+  testWidgets('footer destinations report their own index', (tester) async {
+    final footer = <int>[];
+    await tester.pumpWidget(
+      wrap(
+        bar(
+          footer: <SlateActivityItem>[
+            const SlateActivityItem(
+              icon: SlateIcons.settings,
+              tooltip: 'Settings',
+            ),
+          ],
+          onFooter: footer.add,
+        ),
+      ),
+    );
+
+    await tester.tap(find.byTooltip('Settings'));
+    await tester.pump();
+    // Indexed into the footer list, not continuing the main one.
+    expect(footer, <int>[0]);
+  });
+
+  testWidgets('a negative selection selects nothing', (tester) async {
+    await tester.pumpWidget(wrap(bar(selected: -1)));
+
+    for (final label in <String>['Tasks', 'Gantt', 'Conflicts']) {
+      expect(propertiesFor(tester, label).selected, isFalse, reason: label);
+    }
+  });
+}

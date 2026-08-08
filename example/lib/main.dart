@@ -57,6 +57,8 @@ class _GalleryState extends State<_Gallery> {
   String _mode = 'Fill';
   double _size = 12;
   String _lastCommand = 'nothing yet';
+  int _shellCategory = 1;
+  String _shellTab = 'a';
 
   @override
   void dispose() {
@@ -163,6 +165,10 @@ class _GalleryState extends State<_Gallery> {
                   ),
                   SizedBox(height: theme.metrics.pad + 8),
 
+                  _section(theme, 'Shell'),
+                  _shell(theme),
+                  SizedBox(height: theme.metrics.pad + 8),
+
                   _section(theme, 'Last command'),
                   Text(_lastCommand, style: theme.dimTextStyle),
                 ],
@@ -178,6 +184,108 @@ class _GalleryState extends State<_Gallery> {
     padding: const EdgeInsets.only(bottom: 8),
     child: Text(label.toUpperCase(), style: theme.sectionStyle),
   );
+
+  /// The window furniture assembled the way an application uses it: a rail, a
+  /// titled panel, a draggable divider, document tabs and a status bar. Shown
+  /// together rather than one at a time because what matters about these is
+  /// whether their edges line up.
+  Widget _shell(SlateThemeData theme) {
+    return Container(
+      height: 260,
+      decoration: BoxDecoration(
+        border: Border.all(color: theme.palette.border),
+      ),
+      child: Row(
+        children: <Widget>[
+          SlateActivityBar(
+            items: const <SlateActivityItem>[
+              SlateActivityItem(icon: SlateIcons.list, tooltip: 'Tasks'),
+              SlateActivityItem(icon: SlateIcons.gantt, tooltip: 'Timeline'),
+              SlateActivityItem(icon: SlateIcons.calendar, tooltip: 'Calendar'),
+              SlateActivityItem(
+                icon: SlateIcons.resource,
+                tooltip: 'Resources',
+              ),
+              SlateActivityItem(
+                icon: SlateIcons.warning,
+                tooltip: 'Problems',
+                badge: '3',
+              ),
+            ],
+            selectedIndex: _shellCategory,
+            onSelected: (i) => setState(() => _shellCategory = i),
+            footerItems: const <SlateActivityItem>[
+              SlateActivityItem(icon: SlateIcons.settings, tooltip: 'Settings'),
+            ],
+            onFooterSelected: (_) => setState(() => _lastCommand = 'Settings'),
+          ),
+          Expanded(
+            child: Column(
+              children: <Widget>[
+                SlateTabStrip(
+                  tabs: const <SlateTab>[
+                    SlateTab(id: 'a', label: 'north-wing.plan'),
+                    SlateTab(id: 'b', label: 'fit-out.plan', modified: true),
+                  ],
+                  selectedId: _shellTab,
+                  onSelected: (id) => setState(() => _shellTab = id),
+                  onClosed: (id) => setState(() => _lastCommand = 'Close $id'),
+                  closeTooltip: 'Close',
+                ),
+                Expanded(
+                  child: SlateSplitView(
+                    initialFraction: 0.34,
+                    minStartExtent: 120,
+                    minEndExtent: 140,
+                    start: SlateSidePanel(
+                      title: 'Outline',
+                      actions: <Widget>[
+                        SlateIconButton(
+                          icon: SlateIcons.filter,
+                          onPressed: () =>
+                              setState(() => _lastCommand = 'Filter'),
+                          tooltip: 'Filter',
+                        ),
+                      ],
+                      child: Padding(
+                        padding: EdgeInsets.all(theme.metrics.pad),
+                        child: Text(
+                          'Tree, filters, saved views',
+                          style: theme.dimTextStyle,
+                        ),
+                      ),
+                    ),
+                    end: ColoredBox(
+                      color: theme.palette.background,
+                      child: Center(
+                        child: Text('Main view', style: theme.dimTextStyle),
+                      ),
+                    ),
+                  ),
+                ),
+                SlateStatusBar(
+                  leading: <Widget>[
+                    const SlateStatusItem(label: '128 rows'),
+                    const SlateStatusItem(label: '9 on the long path'),
+                  ],
+                  trailing: <Widget>[
+                    SlateStatusItem(
+                      label: '3 problems',
+                      icon: SlateIcons.warning,
+                      emphasis: true,
+                      tooltip: 'Show problems',
+                      onPressed: () =>
+                          setState(() => _lastCommand = 'Problems'),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 
   /// The merged title and menu row, drawn the way a desktop application that
   /// hides the system title bar has to draw it.
@@ -417,6 +525,19 @@ class _GalleryState extends State<_Gallery> {
       'eye': SlateIcons.eye,
       'signature': SlateIcons.signature,
       'textCursor': SlateIcons.textCursor,
+      'calendar': SlateIcons.calendar,
+      'gantt': SlateIcons.gantt,
+      'milestone': SlateIcons.milestone,
+      'resource': SlateIcons.resource,
+      'baseline': SlateIcons.baseline,
+      'warning': SlateIcons.warning,
+      'report': SlateIcons.report,
+      'settings': SlateIcons.settings,
+      'link': SlateIcons.link,
+      'filter': SlateIcons.filter,
+      'indentIncrease': SlateIcons.indentIncrease,
+      'indentDecrease': SlateIcons.indentDecrease,
+      'criticalPath': SlateIcons.criticalPath,
     };
 
     return Wrap(
