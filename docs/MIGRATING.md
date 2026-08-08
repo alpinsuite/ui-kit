@@ -52,9 +52,12 @@ import 'package:slate_ui/slate_ui.dart';
 | `lib/ui/tool_palette.dart` | `import '../slate/slate.dart';` |
 | `lib/ui/window_bar.dart` | `import '../slate/slate.dart';` |
 
-`package:` imports sort before relative ones, so `directives_ordering` will want
-the line moved up in files that have both. `dart format` does not do this;
-`dart fix --apply` does.
+`package:` imports sort before relative ones, so the new line belongs in the
+`package:` block rather than where the relative one sat.
+`tools/migrate_paint.sh` puts it there. Nothing downstream will do it for you:
+`dart format` does not reorder imports, and `dart fix --apply` only acts on
+`directives_ordering`, which `flutter_lints` does not enable — so an import left
+in the middle of the relative block raises nothing from the analyzer at all.
 
 No other code changes. The kit was extracted unchanged — same class names, same
 parameters, same behaviour.

@@ -69,8 +69,37 @@ IMPORTS="$(grep -rl "import '\(\.\./\)*\(\.\./\)*slate/slate\.dart';" lib --incl
 if [[ -z "$IMPORTS" ]]; then
   echo "  ok    no relative slate imports left"
 else
+  # Rewriting in place would leave a package: import sitting wherever the
+  # relative one happened to sort — in the middle of the relative block. Nothing
+  # downstream corrects that: `dart fix` only acts on `directives_ordering`, and
+  # flutter_lints does not enable it, so the analyzer stays silent about it.
   while IFS= read -r file; do
-    sed -i "s|import '\(\.\./\)*slate/slate\.dart';|import 'package:slate_ui/slate_ui.dart';|" "$file"
+    python3 - "$file" <<'PY'
+import re
+import sys
+
+path = sys.argv[1]
+target = "import 'package:slate_ui/slate_ui.dart';"
+relative = re.compile(r"^import '(\.\./)*slate/slate\.dart';$")
+
+with open(path, encoding='utf-8') as handle:
+    lines = handle.read().split('\n')
+
+lines = [line for line in lines if not relative.match(line)]
+
+package = [i for i, line in enumerate(lines) if line.startswith("import 'package:")]
+if not package:
+    raise SystemExit(f'{path}: no package: import block for the kit to join')
+
+start, end = package[0], package[-1]
+if end - start + 1 != len(package):
+    raise SystemExit(f'{path}: package: imports are not one contiguous block')
+
+lines[start:end + 1] = sorted(lines[start:end + 1] + [target])
+
+with open(path, 'w', encoding='utf-8', newline='\n') as handle:
+    handle.write('\n'.join(lines))
+PY
     echo "  wrote $file"
     CHANGED=1
   done <<< "$IMPORTS"
@@ -103,8 +132,7 @@ Next, by hand (see docs/MIGRATING.md):
 
 Then:
   flutter pub get
-  dart fix --apply          # package: imports sort above relative ones
-  dart format .
+  dart format .             # dropping the old import can leave a stray blank line
   flutter analyze --fatal-infos
   flutter test
 NEXT
