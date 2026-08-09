@@ -44,11 +44,39 @@ class SlateGridController extends ChangeNotifier {
   final ScrollController header = ScrollController();
   final ScrollController body = ScrollController();
 
+  /// The row scroll. Exposed so a caller driving the grid from the keyboard can
+  /// keep the focused row on screen — a cursor that moves out of view is a
+  /// cursor the user has lost.
+  final ScrollController vertical = ScrollController();
+
   bool _syncing = false;
 
   SlateGridController() {
     header.addListener(() => _mirror(header, body));
     body.addListener(() => _mirror(body, header));
+  }
+
+  /// Scrolls the least distance that brings row [index] fully into view.
+  ///
+  /// The least distance on purpose: jumping the row to the middle of the
+  /// viewport on every arrow press makes the whole grid lurch, and the user
+  /// loses the surrounding rows they were reading.
+  void revealRow(int index, double rowHeight) {
+    if (!vertical.hasClients) return;
+    final position = vertical.position;
+    final top = index * rowHeight;
+    final bottom = top + rowHeight;
+
+    if (top < position.pixels) {
+      vertical.jumpTo(top.clamp(0.0, position.maxScrollExtent));
+    } else if (bottom > position.pixels + position.viewportDimension) {
+      vertical.jumpTo(
+        (bottom - position.viewportDimension).clamp(
+          0.0,
+          position.maxScrollExtent,
+        ),
+      );
+    }
   }
 
   void _mirror(ScrollController from, ScrollController to) {
@@ -63,6 +91,7 @@ class SlateGridController extends ChangeNotifier {
   void dispose() {
     header.dispose();
     body.dispose();
+    vertical.dispose();
     super.dispose();
   }
 }
@@ -203,6 +232,7 @@ class _SlateDataGridState extends State<SlateDataGrid> {
             child: SizedBox(
               width: _totalWidth,
               child: ListView.builder(
+                controller: _controller.vertical,
                 itemCount: widget.rowCount,
                 itemExtent: rowHeight,
                 itemBuilder: (context, row) => _GridRow(

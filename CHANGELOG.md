@@ -7,6 +7,20 @@ and the package uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.5.0] - 2026-08-08
+
+### Added
+
+- **`SlateGridController.vertical` and `.revealRow`.** A grid driven from the
+  keyboard has to keep the focused row on screen: a cursor that moves out of
+  view is a cursor the user has lost, and they will press the arrow again.
+
+  `revealRow` scrolls the *least* distance that makes the row visible rather
+  than centring it. Centring on every arrow press makes the whole grid lurch
+  and takes away the surrounding rows the user was reading. It is also safe to
+  call before the grid has been laid out, which is what restoring a saved
+  cursor does.
+
 ## [0.4.0] - 2026-08-08
 
 ### Added

@@ -217,6 +217,83 @@ void main() {
     expect(controller.header.offset, 80);
   });
 
+  group('revealRow', () {
+    Future<SlateGridController> pumpTall(WidgetTester tester) async {
+      final controller = SlateGridController();
+      addTearDown(controller.dispose);
+      await tester.pumpWidget(
+        wrap(
+          SizedBox(
+            width: 500,
+            // The body gets this less the header row and its rule, so the
+            // expectations below read the viewport rather than assuming it.
+            height: 210,
+            child: SlateDataGrid(
+              columns: columns,
+              rowCount: 500,
+              controller: controller,
+              rowHeight: 21,
+              cellBuilder: (context, row, column) => Text('${column.id}-$row'),
+            ),
+          ),
+        ),
+      );
+      return controller;
+    }
+
+    testWidgets('does nothing for a row already on screen', (tester) async {
+      final controller = await pumpTall(tester);
+      controller.revealRow(3, 21);
+      await tester.pumpAndSettle();
+      expect(controller.vertical.offset, 0);
+    });
+
+    testWidgets('scrolls the least distance to bring a row below into view', (
+      tester,
+    ) async {
+      final controller = await pumpTall(tester);
+      final viewport = controller.vertical.position.viewportDimension;
+      controller.revealRow(10, 21);
+      await tester.pumpAndSettle();
+
+      // Flush with the bottom edge, not centred: the least distance that makes
+      // it visible.
+      expect(controller.vertical.offset, 11 * 21 - viewport);
+    });
+
+    testWidgets('scrolls back up for a row above the viewport', (tester) async {
+      final controller = await pumpTall(tester);
+      controller.vertical.jumpTo(400);
+      await tester.pumpAndSettle();
+
+      controller.revealRow(2, 21);
+      await tester.pumpAndSettle();
+      expect(controller.vertical.offset, 42);
+    });
+
+    testWidgets('clamps rather than overscrolling at the ends', (tester) async {
+      final controller = await pumpTall(tester);
+      controller.revealRow(499, 21);
+      await tester.pumpAndSettle();
+      expect(
+        controller.vertical.offset,
+        controller.vertical.position.maxScrollExtent,
+      );
+
+      controller.revealRow(0, 21);
+      await tester.pumpAndSettle();
+      expect(controller.vertical.offset, 0);
+    });
+
+    testWidgets('is safe before the grid has been laid out', (tester) async {
+      final controller = SlateGridController();
+      addTearDown(controller.dispose);
+      // No clients yet; a caller restoring a saved cursor hits this.
+      controller.revealRow(40, 21);
+      expect(tester.takeException(), isNull);
+    });
+  });
+
   testWidgets('an empty grid still draws its header', (tester) async {
     await tester.pumpWidget(wrap(grid(rowCount: 0)));
     expect(find.text('Name'), findsOneWidget);
