@@ -7,6 +7,22 @@ and the package uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.7.0] - 2026-08-08
+
+### Added
+
+- **`showSlateContextMenu` and `SlateContextMenuItem`** — the right-click
+  popup, reusing the menu-bar row rendering so the two look like one thing.
+
+  Items are values rather than widgets, unlike the menu bar's. A context menu
+  has to close *before* it runs anything — a popup still covering the row it
+  just changed hides the result — and that is only possible if the menu owns
+  the callback instead of being handed an opaque child.
+
+  A menu opened near an edge is flipped back inside the window. One that spills
+  off the bottom is one whose last row cannot be reached, and the last row is
+  usually the destructive one.
+
 ## [0.6.0] - 2026-08-08
 
 ### Added
@@ -25,6 +41,7 @@ and the package uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   so the pair cannot drift apart. `volumeOff` strikes through with a cross
   rather than a slash: at sixteen pixels a slash reads as one more wave, which
   is the opposite of what it means.
+
 ## [0.5.1] - 2026-08-08
 
 ### Fixed

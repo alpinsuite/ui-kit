@@ -21,6 +21,7 @@
 library;
 
 export 'src/slate_activity_bar.dart';
+export 'src/slate_context_menu.dart';
 export 'src/slate_controls.dart';
 export 'src/slate_data_grid.dart';
 export 'src/slate_dialog.dart';
