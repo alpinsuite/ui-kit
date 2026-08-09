@@ -7,7 +7,7 @@ description: >-
 # Single source of truth for the package version. `tools/set_version.sh` reads
 # and writes it, and the release workflow checks the git tag against it.
 # See docs/RELEASING.md.
-version: 0.5.1
+version: 0.6.0
 
 repository: https://github.com/alpinsuite/ui-kit
 issue_tracker: https://github.com/alpinsuite/ui-kit/issues

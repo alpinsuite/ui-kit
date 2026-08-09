@@ -824,6 +824,93 @@ abstract final class SlateIcons {
       ..drawCircle(const Offset(8, 7.2), 1.3, stroke)
       ..drawCircle(const Offset(12.6, 3.6), 1.3, stroke);
   }
+
+  // Media transport.
+
+  /// Filled rather than stroked, and so is [pause].
+  ///
+  /// A transport control is read at a glance, often at the edge of vision while
+  /// something else holds the attention, and a hairline triangle does not
+  /// survive that. These two are the only glyphs in the set that carry weight
+  /// on purpose.
+  ///
+  /// The triangle sits slightly right of the box's centre because a shape that
+  /// points reads as centred when its area is, not when its bounds are.
+  static void play(Canvas canvas, Paint stroke) {
+    canvas.drawPath(
+      Path()
+        ..moveTo(5.2, 3.4)
+        ..lineTo(12.8, 8)
+        ..lineTo(5.2, 12.6)
+        ..close(),
+      Paint()
+        ..color = stroke.color
+        ..style = PaintingStyle.fill
+        ..isAntiAlias = true,
+    );
+  }
+
+  static void pause(Canvas canvas, Paint stroke) {
+    final fill = Paint()
+      ..color = stroke.color
+      ..style = PaintingStyle.fill
+      ..isAntiAlias = true;
+    canvas
+      ..drawRRect(
+        RRect.fromLTRBR(4.6, 3.6, 6.9, 12.4, const Radius.circular(0.6)),
+        fill,
+      )
+      ..drawRRect(
+        RRect.fromLTRBR(9.1, 3.6, 11.4, 12.4, const Radius.circular(0.6)),
+        fill,
+      );
+  }
+
+  /// A speaker with two waves. Pairs with [volumeOff].
+  static void volume(Canvas canvas, Paint stroke) {
+    _speaker(canvas, stroke);
+    canvas
+      ..drawArc(
+        Rect.fromCircle(center: const Offset(8.4, 8), radius: 2.6),
+        -math.pi / 3,
+        2 * math.pi / 3,
+        false,
+        stroke,
+      )
+      ..drawArc(
+        Rect.fromCircle(center: const Offset(8.4, 8), radius: 4.6),
+        -math.pi / 3,
+        2 * math.pi / 3,
+        false,
+        stroke,
+      );
+  }
+
+  /// A speaker with the waves struck through — muted.
+  ///
+  /// A cross rather than a single slash: at 16 pixels a slash reads as one more
+  /// wave, which is the opposite of the meaning.
+  static void volumeOff(Canvas canvas, Paint stroke) {
+    _speaker(canvas, stroke);
+    canvas
+      ..drawLine(const Offset(10.2, 6.2), const Offset(13.6, 9.8), stroke)
+      ..drawLine(const Offset(13.6, 6.2), const Offset(10.2, 9.8), stroke);
+  }
+
+  /// The cone shared by [volume] and [volumeOff], so the two cannot drift.
+  static void _speaker(Canvas canvas, Paint stroke) {
+    canvas.drawPath(
+      Path()
+        ..moveTo(3, 6.2)
+        ..lineTo(5.2, 6.2)
+        ..lineTo(8, 3.4)
+        ..lineTo(8, 12.6)
+        ..lineTo(5.2, 9.8)
+        ..lineTo(3, 9.8)
+        ..close(),
+      stroke,
+    );
+  }
 }
 
 /// Renders a [SlateIconDraw] at a given size and colour.

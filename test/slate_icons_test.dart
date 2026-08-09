@@ -67,6 +67,10 @@ const Map<String, SlateIconDraw> _glyphs = <String, SlateIconDraw>{
   'indentIncrease': SlateIcons.indentIncrease,
   'indentDecrease': SlateIcons.indentDecrease,
   'criticalPath': SlateIcons.criticalPath,
+  'play': SlateIcons.play,
+  'pause': SlateIcons.pause,
+  'volume': SlateIcons.volume,
+  'volumeOff': SlateIcons.volumeOff,
 };
 
 void main() {

@@ -600,6 +600,10 @@ class _GalleryState extends State<_Gallery> {
       'indentIncrease': SlateIcons.indentIncrease,
       'indentDecrease': SlateIcons.indentDecrease,
       'criticalPath': SlateIcons.criticalPath,
+      'play': SlateIcons.play,
+      'pause': SlateIcons.pause,
+      'volume': SlateIcons.volume,
+      'volumeOff': SlateIcons.volumeOff,
     };
 
     return Wrap(

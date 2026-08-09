@@ -7,6 +7,24 @@ and the package uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.6.0] - 2026-08-08
+
+### Added
+
+- **Media transport glyphs: `play`, `pause`, `volume` and `volumeOff`.**
+  Kino needs them for its transport bar, and no application should be drawing
+  its own — a set that is uniform everywhere except the one control the user
+  looks at most is not a uniform set.
+
+  `play` and `pause` are filled rather than stroked, and are the only glyphs
+  here that are. A transport control is read at a glance, often at the edge of
+  vision while something else holds the attention, and a hairline triangle does
+  not survive that.
+
+  `volume` and `volumeOff` share their speaker cone through one private helper
+  so the pair cannot drift apart. `volumeOff` strikes through with a cross
+  rather than a slash: at sixteen pixels a slash reads as one more wave, which
+  is the opposite of what it means.
 ## [0.5.1] - 2026-08-08
 
 ### Fixed
