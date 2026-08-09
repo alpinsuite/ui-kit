@@ -174,4 +174,59 @@ void main() {
     expect(find.bySemanticsLabel('Edit'), findsOneWidget);
     handle.dispose();
   });
+
+  testWidgets('the whole cell is the target, not just the icon', (
+    tester,
+  ) async {
+    // The regression this exists for: the button was a bare SizedBox around a
+    // Stack, so with the default deferToChild the only hit-testable thing in
+    // it was the icon. The rail read as unresponsive, because clicking a
+    // destination anywhere but dead centre did nothing.
+    var selected = -1;
+    await tester.pumpWidget(
+      wrap(
+        SlateActivityBar(
+          items: const <SlateActivityItem>[
+            SlateActivityItem(icon: SlateIcons.eye, tooltip: 'View'),
+            SlateActivityItem(icon: SlateIcons.layers, tooltip: 'Pages'),
+          ],
+          selectedIndex: 0,
+          onSelected: (index) => selected = index,
+        ),
+      ),
+    );
+
+    final cell = tester.getRect(find.byType(SlateIcon).at(1));
+    final box = tester.getRect(find.byType(SlateActivityBar));
+    // A corner of the second cell, well away from its glyph.
+    await tester.tapAt(Offset(box.left + 3, cell.center.dy - 14));
+    expect(selected, 1);
+  });
+
+  testWidgets('a disabled destination ignores a corner tap too', (
+    tester,
+  ) async {
+    var selected = -1;
+    await tester.pumpWidget(
+      wrap(
+        SlateActivityBar(
+          items: const <SlateActivityItem>[
+            SlateActivityItem(icon: SlateIcons.eye, tooltip: 'View'),
+            SlateActivityItem(
+              icon: SlateIcons.layers,
+              tooltip: 'Pages',
+              enabled: false,
+            ),
+          ],
+          selectedIndex: 0,
+          onSelected: (index) => selected = index,
+        ),
+      ),
+    );
+
+    final cell = tester.getRect(find.byType(SlateIcon).at(1));
+    final box = tester.getRect(find.byType(SlateActivityBar));
+    await tester.tapAt(Offset(box.left + 3, cell.center.dy - 14));
+    expect(selected, -1);
+  });
 }

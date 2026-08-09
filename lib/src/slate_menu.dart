@@ -212,6 +212,7 @@ class _MenuLabelState extends State<_MenuLabel> {
       },
       onExit: (_) => setState(() => _hover = false),
       child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
         onTap: widget.onTap,
         child: Container(
           height: theme.metrics.controlHeight + 6,
@@ -274,6 +275,7 @@ class _SlateMenuItemState extends State<SlateMenuItem> {
       onEnter: (_) => setState(() => _hover = true),
       onExit: (_) => setState(() => _hover = false),
       child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
         onTap: enabled
             ? () {
                 if (widget.closesMenu) scope?.closeAll();
@@ -401,6 +403,7 @@ class _SubmenuRowState extends State<_SubmenuRow> {
       },
       onExit: (_) => setState(() => _hover = false),
       child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
         onTap: widget.onTap,
         child: Container(
           height: theme.metrics.rowHeight,

@@ -66,6 +66,7 @@ class _SlateSelectState<T> extends State<SlateSelect<T>> {
             onEnter: (_) => setState(() => _hover = true),
             onExit: (_) => setState(() => _hover = false),
             child: GestureDetector(
+              behavior: HitTestBehavior.opaque,
               onTap: () =>
                   controller.isOpen ? controller.close() : controller.open(),
               child: Container(
@@ -133,6 +134,7 @@ class _SelectRowState extends State<_SelectRow> {
       onEnter: (_) => setState(() => _hover = true),
       onExit: (_) => setState(() => _hover = false),
       child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
         onTap: () {
           SlateMenuScope.maybeOf(context)?.closeAll();
           widget.onPressed();

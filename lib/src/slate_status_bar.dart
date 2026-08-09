@@ -71,6 +71,7 @@ class _SlateStatusItemState extends State<SlateStatusItem> {
       onEnter: (_) => setState(() => _hover = true),
       onExit: (_) => setState(() => _hover = false),
       child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
         onTap: widget.onPressed,
         child: Semantics(
           label: widget.tooltip ?? widget.label,

@@ -143,6 +143,7 @@ class _ActivityButtonState extends State<_ActivityButton> {
         onEnter: (_) => setState(() => _hover = true),
         onExit: (_) => setState(() => _hover = false),
         child: GestureDetector(
+          behavior: HitTestBehavior.opaque,
           onTap: widget.item.enabled ? widget.onPressed : null,
           child: Semantics(
             label: widget.item.tooltip,

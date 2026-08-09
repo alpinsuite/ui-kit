@@ -104,7 +104,11 @@ class _SlateTreeRowState extends State<SlateTreeRow> {
     );
 
     if (widget.onTap != null) {
-      row = GestureDetector(onTap: widget.onTap, child: row);
+      row = GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: widget.onTap,
+        child: row,
+      );
     }
 
     return MouseRegion(

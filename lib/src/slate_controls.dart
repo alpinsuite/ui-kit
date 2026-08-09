@@ -76,6 +76,7 @@ class _SlateButtonState extends State<SlateButton> {
       onEnter: (_) => setState(() => _hover = true),
       onExit: (_) => setState(() => _hover = false),
       child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
         onTap: widget.onPressed,
         child: Container(
           height: theme.metrics.buttonHeight,
@@ -175,6 +176,7 @@ class _SlateIconButtonState extends State<SlateIconButton> {
         onEnter: (_) => setState(() => _hover = true),
         onExit: (_) => setState(() => _hover = false),
         child: GestureDetector(
+          behavior: HitTestBehavior.opaque,
           onTap: widget.onPressed,
           child: Semantics(
             label: widget.tooltip,
@@ -234,6 +236,7 @@ class _SlateCheckboxState extends State<SlateCheckbox> {
       onEnter: (_) => setState(() => _hover = true),
       onExit: (_) => setState(() => _hover = false),
       child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
         // The label is part of the target: a 13px box is a mean thing to ask
         // anyone to hit.
         onTap: () => widget.onChanged(!widget.value),
@@ -358,6 +361,7 @@ class _SegmentState extends State<_Segment> {
       onEnter: (_) => setState(() => _hover = true),
       onExit: (_) => setState(() => _hover = false),
       child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
         onTap: widget.onPressed,
         child: Container(
           height: double.infinity,

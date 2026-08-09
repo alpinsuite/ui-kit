@@ -7,6 +7,28 @@ and the package uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.5.1] - 2026-08-08
+
+### Fixed
+
+- **Clicks landed only where a child happened to paint.** Every
+  `GestureDetector` in the kit but two used the default `deferToChild`, so a
+  control was only as clickable as its contents. `SlateActivityBar` was the
+  worst of them: the button is a bare `SizedBox` around a `Stack`, whose only
+  hit-testable child is the glyph, so a destination ignored every click except
+  one within a few pixels of its centre. The rail read as unresponsive, and
+  the natural response — clicking again, harder, slightly differently — is
+  what eventually worked.
+
+  All of them now set `HitTestBehavior.opaque`, which is what the data grid and
+  the split divider already did. A control's target is now its whole box, in
+  the activity bar, the tabs, the status bar, the tree row, the menu rows, the
+  select and every control in `slate_controls`.
+
+  Found by using pdf-ninja rather than by testing it, which is its own lesson:
+  a widget test taps `find.byType(...)`, and `tester.tap` aims at the centre —
+  the one point that worked.
+
 ## [0.5.0] - 2026-08-08
 
 ### Added

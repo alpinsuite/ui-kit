@@ -152,6 +152,7 @@ class _TabState extends State<_Tab> {
         onEnter: (_) => setState(() => _hoverClose = true),
         onExit: (_) => setState(() => _hoverClose = false),
         child: GestureDetector(
+          behavior: HitTestBehavior.opaque,
           onTap: widget.onClosed,
           child: Semantics(
             label: widget.closeTooltip,
@@ -189,6 +190,7 @@ class _TabState extends State<_Tab> {
       onEnter: (_) => setState(() => _hover = true),
       onExit: (_) => setState(() => _hover = false),
       child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
         onTap: widget.onSelected,
         child: Tooltip(
           message: widget.tab.tooltip ?? widget.tab.label,
