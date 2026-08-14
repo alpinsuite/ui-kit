@@ -767,6 +767,32 @@ abstract final class SlateIcons {
       );
   }
 
+  /// A paperclip: attaching something to what is being written.
+  ///
+  /// Drawn as one open stroke rather than a closed shape — the gap at the
+  /// bottom left is what reads as a clip rather than a bent tube, and it is the
+  /// first thing to go when a paperclip is drawn too small to keep it.
+  static void paperclip(Canvas canvas, Paint stroke) {
+    canvas.drawPath(
+      Path()
+        ..moveTo(14.09, 7.77)
+        ..lineTo(7.97, 13.89)
+        ..arcToPoint(const Offset(2.31, 8.23), radius: const Radius.circular(4))
+        ..lineTo(8.43, 2.11)
+        ..arcToPoint(
+          const Offset(12.21, 5.88),
+          radius: const Radius.circular(2.67),
+        )
+        ..lineTo(6.07, 12.01)
+        ..arcToPoint(
+          const Offset(4.19, 10.12),
+          radius: const Radius.circular(1.33),
+        )
+        ..lineTo(9.85, 4.47),
+      stroke,
+    );
+  }
+
   /// A funnel: narrowing a list to what matters.
   static void filter(Canvas canvas, Paint stroke) {
     canvas.drawPath(

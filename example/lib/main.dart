@@ -671,6 +671,7 @@ class _GalleryState extends State<_Gallery> {
       'report': SlateIcons.report,
       'settings': SlateIcons.settings,
       'link': SlateIcons.link,
+      'paperclip': SlateIcons.paperclip,
       'filter': SlateIcons.filter,
       'indentIncrease': SlateIcons.indentIncrease,
       'indentDecrease': SlateIcons.indentDecrease,

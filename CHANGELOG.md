@@ -9,6 +9,17 @@ and the package uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
+- **`SlateIcons.paperclip`** — the attach glyph.
+
+  Every editor that lets you write also lets you attach, and the set had no
+  glyph for it: `link` is two chain rings and reads as a relation between two
+  things, not as a file coming along with a message.
+
+  Drawn as one open stroke. The gap at the bottom left is what makes it a clip
+  rather than a bent tube, and it is the first thing to disappear when a
+  paperclip is drawn too small — which is why the curve radii are on the same
+  16-unit grid as the rest rather than eyeballed.
+
 - **`SlateActivityItem.label`** — a name drawn under the rail icon.
 
   The icons-only rail is the right default for a tool someone lives in: five

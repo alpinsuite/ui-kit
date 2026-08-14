@@ -63,6 +63,7 @@ const Map<String, SlateIconDraw> _glyphs = <String, SlateIconDraw>{
   'report': SlateIcons.report,
   'settings': SlateIcons.settings,
   'link': SlateIcons.link,
+  'paperclip': SlateIcons.paperclip,
   'filter': SlateIcons.filter,
   'indentIncrease': SlateIcons.indentIncrease,
   'indentDecrease': SlateIcons.indentDecrease,
