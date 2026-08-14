@@ -1,3 +1,4 @@
+import 'package:flutter/gestures.dart' show kDoubleTapTimeout;
 import 'package:flutter/material.dart';
 import 'package:flutter/semantics.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -15,6 +16,7 @@ Widget strip({
   String? selected = 'a',
   ValueChanged<String>? onSelected,
   ValueChanged<String>? onClosed,
+  ValueChanged<String>? onPinned,
   List<SlateTab> tabs = threeTabs,
 }) => SizedBox(
   width: 700,
@@ -23,6 +25,7 @@ Widget strip({
     selectedId: selected,
     onSelected: onSelected ?? (_) {},
     onClosed: onClosed,
+    onPinned: onPinned,
     closeTooltip: 'Close',
   ),
 );
@@ -173,5 +176,95 @@ void main() {
         .whereType<double>()
         .toSet();
     expect(heights.length, lessThanOrEqualTo(1));
+  });
+
+  group('a preview tab', () {
+    testWidgets('is the only one drawn in italic', (tester) async {
+      await tester.pumpWidget(
+        wrap(
+          strip(
+            tabs: const <SlateTab>[
+              SlateTab(id: 'a', label: 'Alpha', preview: true),
+              SlateTab(id: 'b', label: 'Beta'),
+            ],
+          ),
+        ),
+      );
+
+      expect(
+        tester.widget<Text>(find.text('Alpha')).style?.fontStyle,
+        FontStyle.italic,
+      );
+      expect(
+        tester.widget<Text>(find.text('Beta')).style?.fontStyle,
+        FontStyle.normal,
+      );
+    });
+
+    testWidgets('opens on the first click, without waiting for a second', (
+      tester,
+    ) async {
+      // The delay this guards against is invisible in a passing test and
+      // obvious in the hand: `onDoubleTap` would hold the arena open for the
+      // whole double-tap timeout before letting the first click through.
+      final opened = <String>[];
+      await tester.pumpWidget(
+        wrap(strip(onSelected: opened.add, onPinned: (_) {})),
+      );
+
+      await tester.tap(find.text('Beta'));
+      expect(opened, <String>['b']);
+    });
+
+    testWidgets('pins on the second click of a pair', (tester) async {
+      final opened = <String>[];
+      final pinned = <String>[];
+      await tester.pumpWidget(
+        wrap(strip(onSelected: opened.add, onPinned: pinned.add)),
+      );
+
+      await tester.tap(find.text('Beta'));
+      await tester.tap(find.text('Beta'));
+
+      expect(pinned, <String>['b']);
+      expect(opened, <String>[
+        'b',
+        'b',
+      ], reason: 'pinning follows selecting rather than replacing it');
+    });
+
+    testWidgets('two unhurried clicks do not pin', (tester) async {
+      final pinned = <String>[];
+      await tester.pumpWidget(wrap(strip(onPinned: pinned.add)));
+
+      await tester.tap(find.text('Beta'));
+      await tester.pump(kDoubleTapTimeout * 2);
+      await tester.tap(find.text('Beta'));
+
+      expect(pinned, isEmpty);
+    });
+
+    testWidgets('a third click does not pin again', (tester) async {
+      // Otherwise every click after a double click keeps firing the callback,
+      // and a caller that treats pinning as a toggle unpins on click three.
+      final pinned = <String>[];
+      await tester.pumpWidget(wrap(strip(onPinned: pinned.add)));
+
+      await tester.tap(find.text('Beta'));
+      await tester.tap(find.text('Beta'));
+      await tester.tap(find.text('Beta'));
+
+      expect(pinned, <String>['b']);
+    });
+
+    testWidgets('a strip with no pin handler still selects', (tester) async {
+      final opened = <String>[];
+      await tester.pumpWidget(wrap(strip(onSelected: opened.add)));
+
+      await tester.tap(find.text('Beta'));
+      await tester.tap(find.text('Beta'));
+
+      expect(opened, <String>['b', 'b']);
+    });
   });
 }

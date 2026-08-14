@@ -59,6 +59,8 @@ class _GalleryState extends State<_Gallery> {
   String _lastCommand = 'nothing yet';
   int _shellCategory = 1;
   String _shellTab = 'a';
+  String? _shellPreview = 'b';
+  int _labelledCategory = 0;
   int _gridRow = 2;
   final Set<int> _collapsed = <int>{};
 
@@ -169,6 +171,9 @@ class _GalleryState extends State<_Gallery> {
 
                   _section(theme, 'Shell'),
                   _shell(theme),
+                  const SizedBox(height: 24),
+                  _section(theme, 'Labelled rail'),
+                  _labelledRail(theme),
                   SizedBox(height: theme.metrics.pad + 8),
 
                   _section(theme, 'Grid'),
@@ -247,6 +252,67 @@ class _GalleryState extends State<_Gallery> {
     child: Text(label.toUpperCase(), style: theme.sectionStyle),
   );
 
+  /// The same rail with its destinations named, and widened to fit the words.
+  ///
+  /// Worth seeing beside the icons-only one above: the two are the same widget,
+  /// and which is right depends entirely on whether the application is opened
+  /// every morning or twice a week.
+  Widget _labelledRail(SlateThemeData theme) {
+    return SlateTheme(
+      data: SlateThemeData(
+        palette: theme.palette,
+        metrics: const SlateMetrics(activityBarWidth: 68),
+        fontFamily: theme.fontFamily,
+      ),
+      child: Container(
+        height: 220,
+        decoration: BoxDecoration(
+          border: Border.all(color: theme.palette.border),
+        ),
+        child: Row(
+          children: <Widget>[
+            SlateActivityBar(
+              items: const <SlateActivityItem>[
+                SlateActivityItem(
+                  icon: SlateIcons.list,
+                  tooltip: 'Tasks',
+                  label: 'Tasks',
+                ),
+                SlateActivityItem(
+                  icon: SlateIcons.gantt,
+                  tooltip: 'Timeline',
+                  label: 'Timeline',
+                ),
+                SlateActivityItem(
+                  icon: SlateIcons.calendar,
+                  tooltip: 'Calendar',
+                  label: 'Calendar',
+                ),
+                SlateActivityItem(
+                  icon: SlateIcons.resource,
+                  tooltip: 'Resources',
+                  label: 'Resources',
+                ),
+              ],
+              selectedIndex: _labelledCategory,
+              onSelected: (i) => setState(() => _labelledCategory = i),
+              footerItems: const <SlateActivityItem>[
+                SlateActivityItem(
+                  icon: SlateIcons.settings,
+                  tooltip: 'Settings',
+                  label: 'Settings',
+                ),
+              ],
+              onFooterSelected: (_) =>
+                  setState(() => _lastCommand = 'Settings'),
+            ),
+            const Spacer(),
+          ],
+        ),
+      ),
+    );
+  }
+
   /// The window furniture assembled the way an application uses it: a rail, a
   /// titled panel, a draggable divider, document tabs and a status bar. Shown
   /// together rather than one at a time because what matters about these is
@@ -285,13 +351,22 @@ class _GalleryState extends State<_Gallery> {
             child: Column(
               children: <Widget>[
                 SlateTabStrip(
-                  tabs: const <SlateTab>[
-                    SlateTab(id: 'a', label: 'north-wing.plan'),
-                    SlateTab(id: 'b', label: 'fit-out.plan', modified: true),
+                  tabs: <SlateTab>[
+                    const SlateTab(id: 'a', label: 'north-wing.plan'),
+                    SlateTab(
+                      id: 'b',
+                      label: 'fit-out.plan',
+                      modified: true,
+                      preview: _shellPreview == 'b',
+                    ),
                   ],
                   selectedId: _shellTab,
                   onSelected: (id) => setState(() => _shellTab = id),
                   onClosed: (id) => setState(() => _lastCommand = 'Close $id'),
+                  onPinned: (id) => setState(() {
+                    _shellPreview = null;
+                    _lastCommand = 'Pin $id';
+                  }),
                   closeTooltip: 'Close',
                 ),
                 Expanded(

@@ -12,6 +12,7 @@ class SlateActivityItem {
   const SlateActivityItem({
     required this.icon,
     required this.tooltip,
+    this.label,
     this.badge,
     this.enabled = true,
   });
@@ -22,6 +23,20 @@ class SlateActivityItem {
   /// screen reader and close to unusable without one — an unlabelled glyph is a
   /// guess every time until the user has learned all of them.
   final String tooltip;
+
+  /// Drawn under the icon, for a rail whose destinations are named on the
+  /// surface rather than behind a hover.
+  ///
+  /// The icons-only rail is the editor convention, and it is the right one for
+  /// a tool someone lives in: five glyphs are learned in a day and the space
+  /// pays for itself every day after. It is the wrong one for a tool someone
+  /// opens twice a week, where the first minute is spent guessing instead of
+  /// working. Which of the two an application is, the kit cannot know.
+  ///
+  /// A labelled rail wants a wider bar — the item box stays square, so the
+  /// label is clipped to [SlateMetrics.activityBarWidth]. Set it to something
+  /// that fits the words before turning labels on.
+  final String? label;
 
   /// A short count or marker drawn over the icon: unread, unresolved, failing.
   /// A string rather than an int so the caller owns the formatting, including
@@ -134,6 +149,12 @@ class _ActivityButtonState extends State<_ActivityButton> {
     final palette = theme.palette;
     final width = theme.metrics.activityBarWidth;
 
+    final foreground = !widget.item.enabled
+        ? palette.inkDim.withValues(alpha: 0.4)
+        : widget.selected || _hover
+        ? palette.ink
+        : palette.inkDim;
+
     return Tooltip(
       message: widget.item.tooltip,
       child: MouseRegion(
@@ -163,14 +184,34 @@ class _ActivityButtonState extends State<_ActivityButton> {
                       child: Container(width: 2, color: palette.accent),
                     ),
                   Center(
-                    child: SlateIcon(
-                      widget.item.icon,
-                      size: theme.metrics.iconSize + 3,
-                      color: !widget.item.enabled
-                          ? palette.inkDim.withValues(alpha: 0.4)
-                          : widget.selected || _hover
-                          ? palette.ink
-                          : palette.inkDim,
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: <Widget>[
+                        SlateIcon(
+                          widget.item.icon,
+                          size: theme.metrics.iconSize + 3,
+                          color: foreground,
+                        ),
+                        if (widget.item.label case final label?) ...<Widget>[
+                          SizedBox(height: theme.metrics.gap / 4),
+                          Padding(
+                            padding: EdgeInsets.symmetric(
+                              horizontal: theme.metrics.gap / 4,
+                            ),
+                            child: Text(
+                              label,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              textAlign: TextAlign.center,
+                              style: theme.textStyle.copyWith(
+                                color: foreground,
+                                fontSize: theme.metrics.smallFontSize,
+                                height: 1.1,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ],
                     ),
                   ),
                   if (widget.item.badge != null)

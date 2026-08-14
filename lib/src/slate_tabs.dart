@@ -1,3 +1,6 @@
+import 'dart:async';
+
+import 'package:flutter/gestures.dart' show kDoubleTapTimeout;
 import 'package:flutter/material.dart';
 
 import 'slate_icons.dart';
@@ -11,6 +14,7 @@ class SlateTab {
     required this.label,
     this.modified = false,
     this.tooltip,
+    this.preview = false,
     this.leading,
   });
 
@@ -25,6 +29,17 @@ class SlateTab {
 
   /// Usually the full path, where the label is only the file name.
   final String? tooltip;
+
+  /// A tab the next single click will replace rather than sit beside.
+  ///
+  /// Drawn in italic, which is the convention editors settled on for it. It is
+  /// what keeps a session of clicking around from ending in forty tabs, and it
+  /// only works if the transience is visible: an italic tab is one the user
+  /// knows to pin before relying on it.
+  ///
+  /// The strip draws the state and reports the gesture — see
+  /// [SlateTabStrip.onPinned]. Which tab is a preview stays the caller's.
+  final bool preview;
 
   /// A small glyph before the label, for a state the label cannot carry:
   /// locked, read-only, in error.
@@ -46,6 +61,7 @@ class SlateTabStrip extends StatelessWidget {
     required this.selectedId,
     required this.onSelected,
     this.onClosed,
+    this.onPinned,
     this.closeTooltip,
     this.trailing = const <Widget>[],
     super.key,
@@ -57,6 +73,13 @@ class SlateTabStrip extends StatelessWidget {
 
   /// Omit to make tabs uncloseable — the close affordance disappears with it.
   final ValueChanged<String>? onClosed;
+
+  /// The second click of a double click, for the caller to clear
+  /// [SlateTab.preview] with.
+  ///
+  /// [onSelected] still fires on both clicks; pinning follows selecting rather
+  /// than replacing it.
+  final ValueChanged<String>? onPinned;
 
   /// The close button's accessible name. A parameter because the kit ships no
   /// localisations, and a button whose only label is an X is unusable with a
@@ -95,6 +118,9 @@ class SlateTabStrip extends StatelessWidget {
                       onClosed: onClosed == null
                           ? null
                           : () => onClosed!(tab.id),
+                      onPinned: onPinned == null
+                          ? null
+                          : () => onPinned!(tab.id),
                       closeTooltip: closeTooltip,
                     ),
                 ],
@@ -114,6 +140,7 @@ class _Tab extends StatefulWidget {
     required this.selected,
     required this.onSelected,
     required this.onClosed,
+    required this.onPinned,
     required this.closeTooltip,
   });
 
@@ -121,6 +148,7 @@ class _Tab extends StatefulWidget {
   final bool selected;
   final VoidCallback onSelected;
   final VoidCallback? onClosed;
+  final VoidCallback? onPinned;
   final String? closeTooltip;
 
   @override
@@ -130,6 +158,39 @@ class _Tab extends StatefulWidget {
 class _TabState extends State<_Tab> {
   bool _hover = false;
   bool _hoverClose = false;
+
+  /// Open between the two clicks of a pair.
+  Timer? _pair;
+
+  @override
+  void dispose() {
+    _pair?.cancel();
+    super.dispose();
+  }
+
+  /// Selects on every click, and pins on the second of a pair.
+  ///
+  /// The pair is counted here rather than handed to `GestureDetector`'s
+  /// `onDoubleTap`: with both callbacks set, the gesture arena stays open until
+  /// the double-tap timer expires, so every single click would wait 300 ms
+  /// before its tab opened. A preview tab exists to make one click cheap, and a
+  /// perceptible delay on that click is the one thing it cannot afford.
+  ///
+  /// A timer rather than two timestamps, because a timer runs on whatever clock
+  /// the binding provides — including the one a widget test controls.
+  void _handleTap() {
+    widget.onSelected();
+
+    if (_pair?.isActive ?? false) {
+      // Cleared rather than restarted: a third click starts a new pair instead
+      // of pinning an already-pinned tab again on every click that follows.
+      _pair!.cancel();
+      _pair = null;
+      widget.onPinned?.call();
+      return;
+    }
+    _pair = Timer(kDoubleTapTimeout, () => _pair = null);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -191,7 +252,7 @@ class _TabState extends State<_Tab> {
       onExit: (_) => setState(() => _hover = false),
       child: GestureDetector(
         behavior: HitTestBehavior.opaque,
-        onTap: widget.onSelected,
+        onTap: _handleTap,
         child: Tooltip(
           message: widget.tab.tooltip ?? widget.tab.label,
           child: Semantics(
@@ -228,9 +289,12 @@ class _TabState extends State<_Tab> {
                     child: Text(
                       widget.tab.label,
                       overflow: TextOverflow.ellipsis,
-                      style: widget.selected
-                          ? theme.textStyle
-                          : theme.textStyle.copyWith(color: palette.inkDim),
+                      style: theme.textStyle.copyWith(
+                        color: widget.selected ? null : palette.inkDim,
+                        fontStyle: widget.tab.preview
+                            ? FontStyle.italic
+                            : FontStyle.normal,
+                      ),
                     ),
                   ),
                   SizedBox(width: theme.metrics.gap / 2),

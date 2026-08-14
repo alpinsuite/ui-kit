@@ -7,6 +7,33 @@ and the package uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+
+- **`SlateActivityItem.label`** — a name drawn under the rail icon.
+
+  The icons-only rail is the right default for a tool someone lives in: five
+  glyphs are learned in a day and the space pays for itself every day after.
+  It is the wrong one for a tool someone opens twice a week, where the first
+  minute goes on guessing. The kit cannot know which an application is, so it
+  now takes the answer as a parameter.
+
+  The item box stays square, so a label is clipped to
+  `SlateMetrics.activityBarWidth` rather than making one destination taller
+  than its neighbours — widen the bar before turning labels on. Unset by
+  default; an existing rail is unchanged.
+
+- **`SlateTab.preview` and `SlateTabStrip.onPinned`** — the transient tab.
+
+  A preview tab is drawn in italic and reported as such; the strip fires
+  `onPinned` on the second click of a pair, and the caller decides what pinning
+  means. Which tab is a preview stays the application's business — the strip
+  only draws the state and reports the gesture.
+
+  The pair is counted inside the strip rather than through `GestureDetector`'s
+  `onDoubleTap`, which would hold the gesture arena open for the whole
+  double-tap timeout and delay every single click by 300 ms. A preview tab
+  exists to make one click cheap, and that is the one delay it cannot afford.
+
 ## [0.7.0] - 2026-08-08
 
 ### Added

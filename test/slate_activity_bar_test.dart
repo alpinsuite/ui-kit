@@ -229,4 +229,103 @@ void main() {
     await tester.tapAt(Offset(box.left + 3, cell.center.dy - 14));
     expect(selected, -1);
   });
+
+  group('a labelled rail', () {
+    testWidgets('draws the label under the icon', (tester) async {
+      await tester.pumpWidget(
+        wrap(
+          SlateActivityBar(
+            items: const <SlateActivityItem>[
+              SlateActivityItem(
+                icon: SlateIcons.list,
+                tooltip: 'Tasks',
+                label: 'Tasks',
+              ),
+            ],
+            selectedIndex: 0,
+            onSelected: (_) {},
+          ),
+        ),
+      );
+
+      expect(find.text('Tasks'), findsOneWidget);
+      expect(
+        tester.getCenter(find.text('Tasks')).dy,
+        greaterThan(tester.getCenter(find.byType(SlateIcon)).dy),
+        reason: 'the label should sit under the icon, not over it',
+      );
+    });
+
+    testWidgets('an unlabelled item draws no text at all', (tester) async {
+      // The tooltip is not a label: it appears on hover, and a rail that
+      // half-labels itself reads as a rendering fault.
+      await tester.pumpWidget(wrap(bar()));
+      expect(find.text('Tasks'), findsNothing);
+    });
+
+    testWidgets('labels do not change the height of a destination', (
+      tester,
+    ) async {
+      // The box stays square, so a caller who turns labels on without widening
+      // the bar gets a clipped word rather than a rail of different heights.
+      await tester.pumpWidget(
+        wrap(
+          SlateActivityBar(
+            items: const <SlateActivityItem>[
+              SlateActivityItem(
+                icon: SlateIcons.list,
+                tooltip: 'Tasks',
+                label: 'Tasks',
+              ),
+              SlateActivityItem(
+                icon: SlateIcons.gantt,
+                tooltip: 'Schedule',
+                label: 'Schedule for the whole quarter',
+              ),
+            ],
+            selectedIndex: 0,
+            onSelected: (_) {},
+          ),
+        ),
+      );
+
+      final width = const SlateMetrics().activityBarWidth;
+      final first = tester.getCenter(find.byType(SlateIcon).at(0));
+      final second = tester.getCenter(find.byType(SlateIcon).at(1));
+      expect(second.dy - first.dy, width);
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('the label follows the icon into the selected ink', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        wrap(
+          SlateActivityBar(
+            items: const <SlateActivityItem>[
+              SlateActivityItem(
+                icon: SlateIcons.list,
+                tooltip: 'Tasks',
+                label: 'Tasks',
+              ),
+              SlateActivityItem(
+                icon: SlateIcons.gantt,
+                tooltip: 'Schedule',
+                label: 'Schedule',
+              ),
+            ],
+            selectedIndex: 0,
+            onSelected: (_) {},
+          ),
+        ),
+      );
+
+      const palette = SlatePalette.dark;
+      expect(tester.widget<Text>(find.text('Tasks')).style?.color, palette.ink);
+      expect(
+        tester.widget<Text>(find.text('Schedule')).style?.color,
+        palette.inkDim,
+      );
+    });
+  });
 }
