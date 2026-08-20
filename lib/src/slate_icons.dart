@@ -1110,6 +1110,24 @@ abstract final class SlateIcons {
       ..drawLine(const Offset(3, 13.2), const Offset(13, 13.2), stroke);
   }
 
+  /// An A with a cross beside it: strip what was applied and leave the letter.
+  ///
+  /// A cross rather than an eraser — a rubber drawn at sixteen pixels is an
+  /// indistinct blob, and the cross is already this set's mark for "not this".
+  static void clearFormat(Canvas canvas, Paint stroke) {
+    canvas
+      ..drawPath(
+        Path()
+          ..moveTo(1.8, 11.4)
+          ..lineTo(5.4, 3.4)
+          ..lineTo(9, 11.4),
+        stroke,
+      )
+      ..drawLine(const Offset(3.2, 8.4), const Offset(7.6, 8.4), stroke)
+      ..drawLine(const Offset(10.2, 8.2), const Offset(14, 12), stroke)
+      ..drawLine(const Offset(14, 8.2), const Offset(10.2, 12), stroke);
+  }
+
   /// A marker pen above the band it leaves. Same arrangement as [fontColor], so
   /// the two sit together in a bar without either looking taller.
   static void highlight(Canvas canvas, Paint stroke) {

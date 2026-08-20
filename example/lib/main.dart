@@ -757,6 +757,7 @@ class _GalleryState extends State<_Gallery> {
       'heading': SlateIcons.heading,
       'pilcrow': SlateIcons.pilcrow,
       'ruler': SlateIcons.ruler,
+      'clearFormat': SlateIcons.clearFormat,
     };
 
     return Wrap(

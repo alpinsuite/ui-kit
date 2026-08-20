@@ -9,11 +9,11 @@ and the package uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
-- Nineteen glyphs for text editing, all on the existing 16-unit grid:
+- Twenty glyphs for text editing, all on the existing 16-unit grid:
   `strikethrough`, `numberedList`, `multilevelList`, `alignJustify`, `table`,
   `image`, `pageBreak`, `fontColor`, `highlight`, `comment`, `trackChanges`,
   `findReplace`, `lineSpacing`, `superscript`, `subscript`, `paintFormat`,
-  `heading`, `pilcrow` and `ruler`. A bullet-list glyph was not added: `list`
+  `heading`, `pilcrow`, `ruler` and `clearFormat`. A bullet-list glyph was not added: `list`
   already is one.
 
   Three of them were drawn twice. Numerals crowd — three digits four units
