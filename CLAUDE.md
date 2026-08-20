@@ -67,6 +67,25 @@ screenshot shows a menu overlapping a bar or a label truncating.
 Never use `pkill -f <pattern>` where the pattern also appears in the command you
 are running — it matches your own shell and kills the session.
 
+**For icons specifically there is a faster way, and it works anywhere** — no
+display, no Xvfb, no built binary. `SlateIconDraw` takes a bare `Canvas`, so a
+throwaway `flutter test` can render a contact sheet straight to a PNG through a
+`PictureRecorder` and `Image.toByteData`, then delete itself:
+
+```dart
+final recorder = ui.PictureRecorder();
+final canvas = Canvas(recorder)..scale(6);
+SlateIcons.pilcrow(canvas, Paint()..style = PaintingStyle.stroke..strokeWidth = 1.2);
+final image = await recorder.endRecording().toImage(96, 96);
+File('build/glyph.png').writeAsBytesSync(
+  (await image.toByteData(format: ui.ImageByteFormat.png))!.buffer.asUint8List());
+```
+
+Do this for every new glyph, at working size *and* enlarged. Three of the
+nineteen text-editing glyphs were wrong in ways completely invisible in the
+source: numerals that touched, a glyph identical to another one, and a brush
+that read as a bottle.
+
 ## Rules that matter
 
 1. **The kit knows nothing about any application.** No controllers, no models,
