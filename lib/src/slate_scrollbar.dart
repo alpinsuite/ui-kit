@@ -175,90 +175,100 @@ class _SlateScrollbarState extends State<SlateScrollbar> {
     final bool horizontal = widget.axis == Axis.horizontal;
     final bool lit = _hovered || _dragging;
 
-    return MouseRegion(
-      onEnter: (PointerEnterEvent _) => setState(() => _hovered = true),
-      onExit: (PointerExitEvent _) => setState(() => _hovered = false),
-      child: LayoutBuilder(
-        builder: (BuildContext context, BoxConstraints constraints) {
-          final double trackExtent = horizontal
-              ? constraints.maxWidth
-              : constraints.maxHeight;
-          final ({double extent, double start})? thumb = _thumb(trackExtent);
+    // Its own thickness across the axis, per kit rule 4. Without it the widget
+    // takes whatever the parent offers, which in the usual arrangement — laid
+    // over a viewport inside a Stack, positioned on three edges — is unbounded,
+    // and the assertion that follows names this file rather than the caller.
+    return SizedBox(
+      width: horizontal ? null : thickness,
+      height: horizontal ? thickness : null,
+      child: MouseRegion(
+        onEnter: (PointerEnterEvent _) => setState(() => _hovered = true),
+        onExit: (PointerExitEvent _) => setState(() => _hovered = false),
+        child: LayoutBuilder(
+          builder: (BuildContext context, BoxConstraints constraints) {
+            final double trackExtent = horizontal
+                ? constraints.maxWidth
+                : constraints.maxHeight;
+            final ({double extent, double start})? thumb = _thumb(trackExtent);
 
-          return GestureDetector(
-            behavior: HitTestBehavior.opaque,
-            onTapDown: (TapDownDetails details) {
-              if (thumb == null) return;
-              final double at = horizontal
-                  ? details.localPosition.dx
-                  : details.localPosition.dy;
-              if (at >= thumb.start && at <= thumb.start + thumb.extent) return;
-              // A click on the empty track pages towards the pointer rather
-              // than jumping to it, which is what every desktop scrollbar the
-              // user has ever used does.
-              final double page = _viewportExtent * 0.9;
-              _report(
-                (_offset + (at < thumb.start ? -page : page)).clamp(
-                  0.0,
-                  _contentExtent - _viewportExtent,
-                ),
-              );
-            },
-            onPanStart: (DragStartDetails details) {
-              if (thumb == null) return;
-              final double at = horizontal
-                  ? details.localPosition.dx
-                  : details.localPosition.dy;
-              setState(() {
-                _dragging = true;
-                _grabWithinThumb =
-                    at >= thumb.start && at <= thumb.start + thumb.extent
-                    ? at - thumb.start
-                    : thumb.extent / 2;
-              });
-            },
-            onPanUpdate: (DragUpdateDetails details) {
-              if (thumb == null) return;
-              final double at = horizontal
-                  ? details.localPosition.dx
-                  : details.localPosition.dy;
-              _scrollToThumbStart(
-                at - _grabWithinThumb,
-                trackExtent,
-                thumb.extent,
-              );
-            },
-            onPanEnd: (DragEndDetails _) => setState(() => _dragging = false),
-            onPanCancel: () => setState(() => _dragging = false),
-            child: Container(
-              color: lit ? palette.panel : const Color(0x00000000),
-              child: thumb == null
-                  ? const SizedBox.expand()
-                  : Stack(
-                      children: <Widget>[
-                        Positioned(
-                          left: horizontal ? thumb.start : 2,
-                          top: horizontal ? 2 : thumb.start,
-                          width: horizontal ? thumb.extent : thickness - 4,
-                          height: horizontal ? thickness - 4 : thumb.extent,
-                          child: DecoratedBox(
-                            decoration: BoxDecoration(
-                              color: _dragging
-                                  ? palette.accent
-                                  : lit
-                                  ? palette.ink
-                                  : palette.inkDim,
-                              borderRadius: BorderRadius.circular(
-                                (thickness - 4) / 2,
+            return GestureDetector(
+              behavior: HitTestBehavior.opaque,
+              onTapDown: (TapDownDetails details) {
+                if (thumb == null) return;
+                final double at = horizontal
+                    ? details.localPosition.dx
+                    : details.localPosition.dy;
+                if (at >= thumb.start && at <= thumb.start + thumb.extent) {
+                  return;
+                }
+                // A click on the empty track pages towards the pointer rather
+                // than jumping to it, which is what every desktop scrollbar the
+                // user has ever used does.
+                final double page = _viewportExtent * 0.9;
+                _report(
+                  (_offset + (at < thumb.start ? -page : page)).clamp(
+                    0.0,
+                    _contentExtent - _viewportExtent,
+                  ),
+                );
+              },
+              onPanStart: (DragStartDetails details) {
+                if (thumb == null) return;
+                final double at = horizontal
+                    ? details.localPosition.dx
+                    : details.localPosition.dy;
+                setState(() {
+                  _dragging = true;
+                  _grabWithinThumb =
+                      at >= thumb.start && at <= thumb.start + thumb.extent
+                      ? at - thumb.start
+                      : thumb.extent / 2;
+                });
+              },
+              onPanUpdate: (DragUpdateDetails details) {
+                if (thumb == null) return;
+                final double at = horizontal
+                    ? details.localPosition.dx
+                    : details.localPosition.dy;
+                _scrollToThumbStart(
+                  at - _grabWithinThumb,
+                  trackExtent,
+                  thumb.extent,
+                );
+              },
+              onPanEnd: (DragEndDetails _) => setState(() => _dragging = false),
+              onPanCancel: () => setState(() => _dragging = false),
+              child: Container(
+                color: lit ? palette.panel : const Color(0x00000000),
+                child: thumb == null
+                    ? const SizedBox.expand()
+                    : Stack(
+                        children: <Widget>[
+                          Positioned(
+                            left: horizontal ? thumb.start : 2,
+                            top: horizontal ? 2 : thumb.start,
+                            width: horizontal ? thumb.extent : thickness - 4,
+                            height: horizontal ? thickness - 4 : thumb.extent,
+                            child: DecoratedBox(
+                              decoration: BoxDecoration(
+                                color: _dragging
+                                    ? palette.accent
+                                    : lit
+                                    ? palette.ink
+                                    : palette.inkDim,
+                                borderRadius: BorderRadius.circular(
+                                  (thickness - 4) / 2,
+                                ),
                               ),
                             ),
                           ),
-                        ),
-                      ],
-                    ),
-            ),
-          );
-        },
+                        ],
+                      ),
+              ),
+            );
+          },
+        ),
       ),
     );
   }

@@ -179,4 +179,41 @@ void main() {
     await tester.pump();
     expect(reported, closeTo(expectedOffset(80), 1));
   });
+
+  testWidgets('carries its own thickness across the axis', (tester) async {
+    // The arrangement it exists for is laid over a viewport inside a Stack,
+    // positioned on three edges — which leaves the fourth unbounded. A widget
+    // that took whatever the parent offered would assert there, naming this
+    // file rather than the caller.
+    await tester.pumpWidget(
+      wrap(
+        SizedBox(
+          height: 200,
+          child: Stack(
+            children: [
+              const Positioned.fill(child: SizedBox()),
+              Positioned(
+                top: 0,
+                right: 0,
+                bottom: 0,
+                child: SlateScrollbar(
+                  axis: Axis.vertical,
+                  offset: 0,
+                  viewportExtent: 100,
+                  contentExtent: 400,
+                  onOffsetChanged: (_) {},
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+
+    expect(tester.takeException(), isNull);
+    expect(
+      tester.getSize(find.byType(SlateScrollbar)).width,
+      SlateMetrics.standard.scrollbarThickness,
+    );
+  });
 }

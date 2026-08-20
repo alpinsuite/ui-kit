@@ -28,6 +28,11 @@ and the package uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   independent, whose wheel scroll is quantised, or part of whose content is
   pinned while the rest moves has no single `ScrollPosition` to offer. A
   `SlateScrollbar.forController` named constructor covers the ordinary case.
+
+  It carries its own thickness across its axis, per rule 4. The arrangement it
+  exists for — laid over a viewport inside a `Stack`, positioned on three edges
+  — leaves the fourth unbounded, so a widget that took whatever the parent
+  offered would assert, naming this file rather than the caller.
 - `SlateMetrics.scrollbarThickness`, 11. Deliberately not scaled by `scaled()`,
   for the same reason `splitterHitExtent` is not: it is a pointer target, and a
   pointer does not get smaller because the interface is dense.
