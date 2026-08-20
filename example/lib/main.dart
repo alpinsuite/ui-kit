@@ -57,6 +57,9 @@ class _GalleryState extends State<_Gallery> {
   String _mode = 'Fill';
   double _size = 12;
   String _lastCommand = 'nothing yet';
+  Color? _fontColor = SlateSwatches.hues.first;
+  Color? _highlight;
+  List<Color> _recentColors = const <Color>[];
   double _scrollX = 0;
   double _scrollY = 0;
   int _shellCategory = 1;
@@ -155,6 +158,44 @@ class _GalleryState extends State<_Gallery> {
                         icon: SlateIcons.search,
                         onPressed: null,
                         tooltip: 'Disabled',
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: theme.metrics.pad + 8),
+
+                  _section(theme, 'Colour'),
+                  Wrap(
+                    spacing: 8,
+                    crossAxisAlignment: WrapCrossAlignment.center,
+                    children: <Widget>[
+                      SlateColorButton(
+                        icon: SlateIcons.fontColor,
+                        tooltip: 'Font colour',
+                        color: _fontColor,
+                        onPressed: () => _ran('Apply font colour'),
+                        onPicked: (color) {
+                          setState(() {
+                            _fontColor = color;
+                            _recentColors = <Color>[
+                              color,
+                              ..._recentColors.where((c) => c != color),
+                            ];
+                          });
+                          _ran('Font colour picked');
+                        },
+                        noColorLabel: 'Automatic',
+                        onNoColor: () => setState(() => _fontColor = null),
+                        recents: _recentColors,
+                        recentsLabel: 'Recent',
+                      ),
+                      SlateColorButton(
+                        icon: SlateIcons.highlight,
+                        tooltip: 'Highlight',
+                        color: _highlight,
+                        onPressed: () => _ran('Apply highlight'),
+                        onPicked: (color) => setState(() => _highlight = color),
+                        noColorLabel: 'None',
+                        onNoColor: () => setState(() => _highlight = null),
                       ),
                     ],
                   ),

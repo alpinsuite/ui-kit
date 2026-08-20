@@ -9,6 +9,22 @@ and the package uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
+- `SlateColorButton` and `SlateColorPopover`, with `SlateSwatches` for the
+  default grid. The button is two halves, which is the whole point: the swatch
+  applies the colour it is showing, the chevron beside it opens the grid — one
+  click to repeat a colour, two only when a different one is wanted.
+
+  The grid's tints are computed from six base hues rather than listed, so a
+  change to a hue cannot leave its own tints behind pointing at a colour no
+  longer in the grid, and the untouched hues are themselves the middle row —
+  picking "red" has to give exactly red, or it never matches again. A swatch is
+  ringed rather than ticked when selected: a tick over a swatch has to be light
+  on dark and dark on light, and choosing which is a guess that is wrong for
+  the middle of every column.
+
+  The kit does not know what the colour is for. "No colour" is a label and a
+  callback, so it means automatic ink to a text tool and no fill to a shape
+  tool, and the caller can replace the whole grid.
 - Twenty glyphs for text editing, all on the existing 16-unit grid:
   `strikethrough`, `numberedList`, `multilevelList`, `alignJustify`, `table`,
   `image`, `pageBreak`, `fontColor`, `highlight`, `comment`, `trackChanges`,
