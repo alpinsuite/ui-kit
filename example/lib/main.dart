@@ -57,6 +57,8 @@ class _GalleryState extends State<_Gallery> {
   String _mode = 'Fill';
   double _size = 12;
   String _lastCommand = 'nothing yet';
+  double _scrollX = 0;
+  double _scrollY = 0;
   int _shellCategory = 1;
   String _shellTab = 'a';
   String? _shellPreview = 'b';
@@ -180,10 +182,66 @@ class _GalleryState extends State<_Gallery> {
                   _dataGrid(theme),
                   SizedBox(height: theme.metrics.pad + 8),
 
+                  _section(theme, 'Scrollbars'),
+                  _scrollbars(theme),
+                  SizedBox(height: theme.metrics.pad + 8),
+
                   _section(theme, 'Last command'),
                   Text(_lastCommand, style: theme.dimTextStyle),
                 ],
               ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// Both axes, offset-driven, over a viewport that is not a Scrollable --
+  /// which is the case the widget exists for. Hovering is the thing to look at:
+  /// the track appears and the thumb firms up only when it is reached for.
+  Widget _scrollbars(SlateThemeData theme) {
+    return SizedBox(
+      height: 120,
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Expanded(
+            child: Column(
+              children: [
+                Expanded(
+                  child: Container(
+                    color: theme.palette.panel,
+                    alignment: Alignment.center,
+                    child: Text(
+                      '${_scrollX.round()}, ${_scrollY.round()}',
+                      style: theme.dimTextStyle,
+                    ),
+                  ),
+                ),
+                SizedBox(
+                  height: theme.metrics.scrollbarThickness,
+                  child: SlateScrollbar(
+                    axis: Axis.horizontal,
+                    offset: _scrollX,
+                    viewportExtent: 300,
+                    contentExtent: 1800,
+                    onOffsetChanged: (value) =>
+                        setState(() => _scrollX = value),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          SizedBox(
+            width: theme.metrics.scrollbarThickness,
+            height: 120 - theme.metrics.scrollbarThickness,
+            child: SlateScrollbar(
+              axis: Axis.vertical,
+              offset: _scrollY,
+              viewportExtent: 110,
+              contentExtent: 2400,
+              onOffsetChanged: (value) => setState(() => _scrollY = value),
             ),
           ),
         ],
@@ -680,6 +738,25 @@ class _GalleryState extends State<_Gallery> {
       'pause': SlateIcons.pause,
       'volume': SlateIcons.volume,
       'volumeOff': SlateIcons.volumeOff,
+      'strikethrough': SlateIcons.strikethrough,
+      'numberedList': SlateIcons.numberedList,
+      'multilevelList': SlateIcons.multilevelList,
+      'alignJustify': SlateIcons.alignJustify,
+      'table': SlateIcons.table,
+      'image': SlateIcons.image,
+      'pageBreak': SlateIcons.pageBreak,
+      'fontColor': SlateIcons.fontColor,
+      'highlight': SlateIcons.highlight,
+      'comment': SlateIcons.comment,
+      'trackChanges': SlateIcons.trackChanges,
+      'findReplace': SlateIcons.findReplace,
+      'lineSpacing': SlateIcons.lineSpacing,
+      'superscript': SlateIcons.superscript,
+      'subscript': SlateIcons.subscript,
+      'paintFormat': SlateIcons.paintFormat,
+      'heading': SlateIcons.heading,
+      'pilcrow': SlateIcons.pilcrow,
+      'ruler': SlateIcons.ruler,
     };
 
     return Wrap(

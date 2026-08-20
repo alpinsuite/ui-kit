@@ -9,6 +9,29 @@ and the package uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
+- Nineteen glyphs for text editing, all on the existing 16-unit grid:
+  `strikethrough`, `numberedList`, `multilevelList`, `alignJustify`, `table`,
+  `image`, `pageBreak`, `fontColor`, `highlight`, `comment`, `trackChanges`,
+  `findReplace`, `lineSpacing`, `superscript`, `subscript`, `paintFormat`,
+  `heading`, `pilcrow` and `ruler`. A bullet-list glyph was not added: `list`
+  already is one.
+
+  Three of them were drawn twice. Numerals crowd — three digits four units
+  apart touch at this stroke weight and read as one squiggle, so each is now
+  boxed inside its own row band. A pen over a rule is `highlight`, so
+  `trackChanges` became the change bar a word processor prints down the margin
+  instead. And a brush tapering to bristles read as a bottle, so `paintFormat`
+  is a roller: all rectangles, which survive being small.
+- `SlateScrollbar`, driven by an offset rather than by a `ScrollController`.
+  Flutter's own `Scrollbar` needs a `ScrollPosition`, which means the thing
+  being scrolled has to be a `Scrollable` — and a viewport whose two axes are
+  independent, whose wheel scroll is quantised, or part of whose content is
+  pinned while the rest moves has no single `ScrollPosition` to offer. A
+  `SlateScrollbar.forController` named constructor covers the ordinary case.
+- `SlateMetrics.scrollbarThickness`, 11. Deliberately not scaled by `scaled()`,
+  for the same reason `splitterHitExtent` is not: it is a pointer target, and a
+  pointer does not get smaller because the interface is dense.
+
 - **`SlateIcons.paperclip`** — the attach glyph.
 
   Every editor that lets you write also lets you attach, and the set had no

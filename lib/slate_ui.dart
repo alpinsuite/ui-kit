@@ -30,6 +30,7 @@ export 'src/slate_menu.dart';
 export 'src/slate_metrics.dart';
 export 'src/slate_palette.dart';
 export 'src/slate_panel.dart';
+export 'src/slate_scrollbar.dart';
 export 'src/slate_select.dart';
 export 'src/slate_split_view.dart';
 export 'src/slate_status_bar.dart';

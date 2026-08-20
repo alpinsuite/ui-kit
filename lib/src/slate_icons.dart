@@ -937,6 +937,358 @@ abstract final class SlateIcons {
       stroke,
     );
   }
+
+  // --- word processing ------------------------------------------------------
+
+  /// An S with a rule through it. The rule carries the meaning, so it runs the
+  /// full width while the letter stays narrow.
+  static void strikethrough(Canvas canvas, Paint stroke) {
+    canvas
+      ..drawPath(
+        Path()
+          ..moveTo(10.8, 5.1)
+          ..cubicTo(10.2, 3.6, 5.6, 3.2, 5.6, 6)
+          ..cubicTo(5.6, 7.2, 7, 7.6, 8, 8)
+          ..moveTo(8, 8)
+          ..cubicTo(9.6, 8.5, 10.6, 9, 10.6, 10.2)
+          ..cubicTo(10.6, 12.8, 6, 12.6, 5.2, 11.1),
+        stroke,
+      )
+      ..drawLine(const Offset(2.8, 8), const Offset(13.2, 8), stroke);
+  }
+
+  /// Three numbered rows.
+  ///
+  /// The numerals are paths rather than type: a font at this size would not
+  /// match the set's weight, and it would be the one glyph that changed shape
+  /// when the ambient text style did. Each is kept inside a band 3 units tall
+  /// centred on its own row — drawn any larger they touch, and three touching
+  /// numerals read as one squiggle.
+  static void numberedList(Canvas canvas, Paint stroke) {
+    const rows = <double>[3.3, 8, 12.7];
+    for (final y in rows) {
+      canvas.drawLine(Offset(7.2, y), Offset(13.4, y), stroke);
+    }
+
+    // 1
+    canvas
+      ..drawLine(
+        Offset(3.8, rows[0] - 1.25),
+        Offset(3.8, rows[0] + 1.25),
+        stroke,
+      )
+      ..drawLine(
+        Offset(2.9, rows[0] - 0.7),
+        Offset(3.8, rows[0] - 1.25),
+        stroke,
+      )
+      // 2
+      ..drawPath(
+        Path()
+          ..moveTo(2.7, rows[1] - 0.7)
+          ..cubicTo(
+            3.1,
+            rows[1] - 1.75,
+            5.1,
+            rows[1] - 1.05,
+            4.4,
+            rows[1] - 0.1,
+          )
+          ..lineTo(2.7, rows[1] + 1.25)
+          ..lineTo(4.9, rows[1] + 1.25),
+        stroke,
+      )
+      // 3
+      ..drawPath(
+        Path()
+          ..moveTo(2.8, rows[2] - 1.25)
+          ..lineTo(4.9, rows[2] - 1.25)
+          ..lineTo(3.7, rows[2] - 0.1)
+          ..cubicTo(5.2, rows[2] - 0.1, 5, rows[2] + 1.45, 3.5, rows[2] + 1.2)
+          ..cubicTo(
+            3.2,
+            rows[2] + 1.15,
+            2.95,
+            rows[2] + 1.05,
+            2.8,
+            rows[2] + 0.8,
+          ),
+        stroke,
+      );
+  }
+
+  /// An outline: two top-level rows with an indented pair between them.
+  static void multilevelList(Canvas canvas, Paint stroke) {
+    final dot = Paint()
+      ..color = stroke.color
+      ..style = PaintingStyle.fill;
+    const rows = <(double, double)>[
+      (3.4, 3.4),
+      (6.4, 6.5),
+      (6.4, 9.5),
+      (3.4, 12.6),
+    ];
+    for (final (left, y) in rows) {
+      canvas
+        ..drawCircle(Offset(left, y), 0.85, dot)
+        ..drawLine(Offset(left + 2.4, y), Offset(13.2, y), stroke);
+    }
+  }
+
+  /// Four full-width rows. Every line reaching both margins is what justified
+  /// text looks like, and it is the only thing separating this from
+  /// [alignLeft].
+  static void alignJustify(Canvas canvas, Paint stroke) {
+    for (var row = 0; row < 4; row++) {
+      final y = 4.0 + row * 2.7;
+      canvas.drawLine(Offset(3, y), Offset(13, y), stroke);
+    }
+  }
+
+  /// A grid with a divided header row, because a plain grid at this size reads
+  /// as a window.
+  static void table(Canvas canvas, Paint stroke) {
+    canvas
+      ..drawRRect(
+        RRect.fromLTRBR(2.5, 3, 13.5, 13, const Radius.circular(1)),
+        stroke,
+      )
+      ..drawLine(const Offset(2.5, 6.3), const Offset(13.5, 6.3), stroke)
+      ..drawLine(const Offset(2.5, 9.7), const Offset(13.5, 9.7), stroke)
+      ..drawLine(const Offset(8, 6.3), const Offset(8, 13), stroke);
+  }
+
+  /// A frame with a horizon and a sun: the shape everyone reads as a picture.
+  static void image(Canvas canvas, Paint stroke) {
+    final fill = Paint()
+      ..color = stroke.color
+      ..style = PaintingStyle.fill;
+    canvas
+      ..drawRRect(
+        RRect.fromLTRBR(2.5, 3.5, 13.5, 12.5, const Radius.circular(1)),
+        stroke,
+      )
+      ..drawCircle(const Offset(6, 6.6), 1.1, fill)
+      ..drawPath(
+        Path()
+          ..moveTo(2.5, 11)
+          ..lineTo(6.2, 8.4)
+          ..lineTo(9, 10.3)
+          ..lineTo(11.2, 8.6)
+          ..lineTo(13.5, 10.4),
+        stroke,
+      );
+  }
+
+  /// Text, air, a dashed rule, air, then text.
+  ///
+  /// The air matters: with the rows evenly spaced the dashed line reads as one
+  /// more row of text rather than as the break between two pages.
+  static void pageBreak(Canvas canvas, Paint stroke) {
+    canvas
+      ..drawLine(const Offset(3, 2.3), const Offset(13, 2.3), stroke)
+      ..drawLine(const Offset(3, 4.5), const Offset(10, 4.5), stroke)
+      ..drawLine(const Offset(3, 11.5), const Offset(13, 11.5), stroke)
+      ..drawLine(const Offset(3, 13.7), const Offset(10, 13.7), stroke);
+    for (final x in const <double>[2.4, 6.6, 10.8]) {
+      canvas.drawLine(Offset(x, 8), Offset(x + 2.8, 8), stroke);
+    }
+  }
+
+  /// An A over a bar. The bar is where the current colour goes, so a caller can
+  /// paint a swatch beneath the glyph rather than recolouring the letter.
+  static void fontColor(Canvas canvas, Paint stroke) {
+    canvas
+      ..drawPath(
+        Path()
+          ..moveTo(3.6, 10.2)
+          ..lineTo(7.4, 2.8)
+          ..lineTo(11.2, 10.2),
+        stroke,
+      )
+      ..drawLine(const Offset(5.1, 7.4), const Offset(9.7, 7.4), stroke)
+      ..drawLine(const Offset(3, 13.2), const Offset(13, 13.2), stroke);
+  }
+
+  /// A marker pen above the band it leaves. Same arrangement as [fontColor], so
+  /// the two sit together in a bar without either looking taller.
+  static void highlight(Canvas canvas, Paint stroke) {
+    canvas
+      ..drawPath(
+        Path()
+          ..moveTo(4.4, 9.6)
+          ..lineTo(9.8, 3.2)
+          ..lineTo(12.4, 5.4)
+          ..lineTo(7, 11.8)
+          ..lineTo(4.4, 11.8)
+          ..close(),
+        stroke,
+      )
+      ..drawLine(const Offset(4.4, 8.2), const Offset(7, 10.4), stroke)
+      ..drawLine(const Offset(3, 13.4), const Offset(13, 13.4), stroke);
+  }
+
+  /// A speech bubble with a tail, and two lines of what was said.
+  static void comment(Canvas canvas, Paint stroke) {
+    canvas
+      ..drawPath(
+        Path()
+          ..moveTo(3.5, 3)
+          ..lineTo(12.5, 3)
+          ..cubicTo(13.3, 3, 13.5, 3.5, 13.5, 4)
+          ..lineTo(13.5, 9.5)
+          ..cubicTo(13.5, 10.2, 13.1, 10.5, 12.5, 10.5)
+          ..lineTo(7, 10.5)
+          ..lineTo(4.2, 13.2)
+          ..lineTo(4.2, 10.5)
+          ..lineTo(3.5, 10.5)
+          ..cubicTo(2.9, 10.5, 2.5, 10.2, 2.5, 9.5)
+          ..lineTo(2.5, 4)
+          ..cubicTo(2.5, 3.4, 2.9, 3, 3.5, 3)
+          ..close(),
+        stroke,
+      )
+      ..drawLine(const Offset(5, 5.8), const Offset(11, 5.8), stroke)
+      ..drawLine(const Offset(5, 8), const Offset(9, 8), stroke);
+  }
+
+  /// A change bar in the margin beside text, with an insertion caret.
+  ///
+  /// The bar down the margin is the convention every word processor prints for
+  /// a revised paragraph, and it is what makes this glyph mean *recorded*
+  /// rather than merely *edited*. Deliberately not a pen over a rule — that is
+  /// [highlight], and at sixteen pixels the two were the same picture.
+  static void trackChanges(Canvas canvas, Paint stroke) {
+    canvas
+      ..drawLine(const Offset(2.4, 2.8), const Offset(2.4, 13.2), stroke)
+      ..drawLine(const Offset(5.2, 3.8), const Offset(13.4, 3.8), stroke)
+      ..drawLine(const Offset(5.2, 7.4), const Offset(10.6, 7.4), stroke)
+      ..drawLine(const Offset(5.2, 12.8), const Offset(13.4, 12.8), stroke)
+      ..drawPath(
+        Path()
+          ..moveTo(8.2, 11)
+          ..lineTo(9.8, 9)
+          ..lineTo(11.4, 11),
+        stroke,
+      );
+  }
+
+  /// A magnifier over a rule: find, then act on what was found.
+  static void findReplace(Canvas canvas, Paint stroke) {
+    canvas
+      ..drawCircle(const Offset(7, 6.4), 3.6, stroke)
+      ..drawLine(const Offset(9.7, 9.1), const Offset(12.6, 12), stroke)
+      ..drawLine(const Offset(2.6, 13.4), const Offset(13.4, 13.4), stroke);
+  }
+
+  /// Rows of text with a double-headed arrow measuring the gap beside them.
+  static void lineSpacing(Canvas canvas, Paint stroke) {
+    for (final y in const <double>[3.6, 7.2, 10.8, 13.4]) {
+      canvas.drawLine(Offset(6.6, y), Offset(13.4, y), stroke);
+    }
+    canvas.drawPath(
+      Path()
+        ..moveTo(3.6, 3)
+        ..lineTo(3.6, 13.6)
+        ..moveTo(2.2, 4.6)
+        ..lineTo(3.6, 3)
+        ..lineTo(5, 4.6)
+        ..moveTo(2.2, 12)
+        ..lineTo(3.6, 13.6)
+        ..lineTo(5, 12),
+      stroke,
+    );
+  }
+
+  /// An x with a raised 2.
+  static void superscript(Canvas canvas, Paint stroke) =>
+      _script(canvas, stroke, raised: true);
+
+  /// An x with a dropped 2.
+  static void subscript(Canvas canvas, Paint stroke) =>
+      _script(canvas, stroke, raised: false);
+
+  /// The x and the 2 shared by [superscript] and [subscript]. Only the height
+  /// of the 2 differs, which is exactly the distinction being drawn — so the
+  /// two glyphs cannot drift apart in anything else.
+  static void _script(Canvas canvas, Paint stroke, {required bool raised}) {
+    final top = raised ? 2.6 : 8.6;
+    canvas
+      ..drawLine(const Offset(2.6, 4.4), const Offset(9, 12.2), stroke)
+      ..drawLine(const Offset(9, 4.4), const Offset(2.6, 12.2), stroke)
+      ..drawPath(
+        Path()
+          ..moveTo(10.6, top + 0.8)
+          ..cubicTo(11.2, top - 0.2, 13.4, top + 0.6, 12.4, top + 1.9)
+          ..lineTo(10.6, top + 3.6)
+          ..lineTo(13.4, top + 3.6),
+        stroke,
+      );
+  }
+
+  /// A roller, its handle, and the band it lays down.
+  ///
+  /// A brush was tried first and read as a bottle: at this size the taper of
+  /// bristles is a few pixels and carries no meaning. A roller is all
+  /// rectangles, which survive being small.
+  static void paintFormat(Canvas canvas, Paint stroke) {
+    canvas
+      ..drawRRect(
+        RRect.fromLTRBR(2.4, 2.6, 11, 6.2, const Radius.circular(0.8)),
+        stroke,
+      )
+      ..drawPath(
+        Path()
+          ..moveTo(11, 4.4)
+          ..lineTo(12.9, 4.4)
+          ..lineTo(12.9, 8.6)
+          ..lineTo(7.6, 8.6)
+          ..lineTo(7.6, 9.8),
+        stroke,
+      )
+      ..drawRRect(
+        RRect.fromLTRBR(5.6, 9.8, 9.6, 13.6, const Radius.circular(0.8)),
+        stroke,
+      );
+  }
+
+  /// A capital H. The letter is the convention for a heading level, and a
+  /// caller wanting "H1" draws the numeral beside it rather than in it.
+  static void heading(Canvas canvas, Paint stroke) {
+    canvas
+      ..drawLine(const Offset(3.4, 3), const Offset(3.4, 13), stroke)
+      ..drawLine(const Offset(10.4, 3), const Offset(10.4, 13), stroke)
+      ..drawLine(const Offset(3.4, 8), const Offset(10.4, 8), stroke);
+  }
+
+  /// The pilcrow, U+00B6 — drawn rather than typed, so it matches the set's
+  /// weight instead of whatever font happens to be in the row.
+  static void pilcrow(Canvas canvas, Paint stroke) {
+    canvas
+      ..drawPath(
+        Path()
+          ..moveTo(9.4, 3)
+          ..lineTo(6.2, 3)
+          ..cubicTo(3.2, 3, 3.2, 8.6, 6.2, 8.6)
+          ..lineTo(9.4, 8.6),
+        stroke,
+      )
+      ..drawLine(const Offset(9.4, 3), const Offset(9.4, 13), stroke)
+      ..drawLine(const Offset(12.4, 3), const Offset(12.4, 13), stroke)
+      ..drawLine(const Offset(9.4, 3), const Offset(12.8, 3), stroke);
+  }
+
+  /// A rule with graduated ticks, long alternating with short.
+  static void ruler(Canvas canvas, Paint stroke) {
+    canvas.drawRRect(
+      RRect.fromLTRBR(2, 5.5, 14, 10.5, const Radius.circular(1)),
+      stroke,
+    );
+    for (var i = 1; i <= 5; i++) {
+      final x = 2 + i * 2.0;
+      canvas.drawLine(Offset(x, 5.5), Offset(x, i.isEven ? 7.4 : 8.4), stroke);
+    }
+  }
 }
 
 /// Renders a [SlateIconDraw] at a given size and colour.

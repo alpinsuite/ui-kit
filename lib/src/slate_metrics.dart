@@ -21,6 +21,7 @@ class SlateMetrics {
     this.activityBarWidth = 48,
     this.tabHeight = 32,
     this.splitterHitExtent = 7,
+    this.scrollbarThickness = 11,
     this.fontSize = 13,
     this.smallFontSize = 12,
     this.iconSize = 15,
@@ -68,6 +69,13 @@ class SlateMetrics {
   /// like and what it is.
   final double splitterHitExtent;
 
+  /// How wide a scrollbar is.
+  ///
+  /// Both a visual width and a pointer target, and the pointer wins: a
+  /// scrollbar thin enough to look right in a dense build is one nobody can
+  /// grab. Eleven is the narrowest that still catches a mouse reliably.
+  final double scrollbarThickness;
+
   final double fontSize;
   final double smallFontSize;
   final double iconSize;
@@ -94,9 +102,10 @@ class SlateMetrics {
       windowBarHeight: windowBarHeight * factor,
       activityBarWidth: activityBarWidth * factor,
       tabHeight: tabHeight * factor,
-      // Deliberately not scaled: this is a pointer target, and a pointer does
+      // Deliberately not scaled: these are pointer targets, and a pointer does
       // not get smaller because the interface is dense.
       splitterHitExtent: splitterHitExtent,
+      scrollbarThickness: scrollbarThickness,
       fontSize: fontSize * factor,
       smallFontSize: smallFontSize * factor,
       iconSize: iconSize * factor,
