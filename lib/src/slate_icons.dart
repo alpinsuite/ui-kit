@@ -1307,6 +1307,222 @@ abstract final class SlateIcons {
       canvas.drawLine(Offset(x, 5.5), Offset(x, i.isEven ? 7.4 : 8.4), stroke);
     }
   }
+
+  // Capture and annotation.
+
+  /// The pointer, for the tool that selects and moves rather than draws.
+  static void cursor(Canvas canvas, Paint stroke) {
+    canvas.drawPath(
+      Path()
+        ..moveTo(4.6, 2.4)
+        ..lineTo(4.6, 12.4)
+        ..lineTo(7.1, 9.9)
+        ..lineTo(8.9, 13.4)
+        ..lineTo(10.6, 12.6)
+        ..lineTo(8.9, 9.2)
+        ..lineTo(12.2, 8.9)
+        ..close(),
+      stroke,
+    );
+  }
+
+  /// The marquee: four corner brackets rather than a closed rectangle, so it
+  /// reads as a region being chosen and not as a rectangle being drawn — which
+  /// is what [rectangle] is for, and the two sit next to each other in a tool
+  /// strip.
+  static void regionSelect(Canvas canvas, Paint stroke) {
+    const inset = 2.5;
+    const arm = 3.0;
+    const far = SlateIcons.grid - inset;
+    canvas
+      ..drawPath(
+        Path()
+          ..moveTo(inset, inset + arm)
+          ..lineTo(inset, inset)
+          ..lineTo(inset + arm, inset),
+        stroke,
+      )
+      ..drawPath(
+        Path()
+          ..moveTo(far - arm, inset)
+          ..lineTo(far, inset)
+          ..lineTo(far, inset + arm),
+        stroke,
+      )
+      ..drawPath(
+        Path()
+          ..moveTo(far, far - arm)
+          ..lineTo(far, far)
+          ..lineTo(far - arm, far),
+        stroke,
+      )
+      ..drawPath(
+        Path()
+          ..moveTo(inset + arm, far)
+          ..lineTo(inset, far)
+          ..lineTo(inset, far - arm),
+        stroke,
+      );
+  }
+
+  /// A display, for capturing one whole screen.
+  static void monitor(Canvas canvas, Paint stroke) {
+    canvas
+      ..drawRRect(
+        RRect.fromLTRBR(1.8, 3, 14.2, 11.4, const Radius.circular(1.4)),
+        stroke,
+      )
+      ..drawLine(const Offset(8, 11.4), const Offset(8, 13.4), stroke)
+      ..drawLine(const Offset(5.6, 13.4), const Offset(10.4, 13.4), stroke);
+  }
+
+  /// A camera, for taking the shot.
+  static void camera(Canvas canvas, Paint stroke) {
+    canvas
+      ..drawPath(
+        Path()
+          ..moveTo(5.8, 4.4)
+          ..lineTo(6.7, 2.6)
+          ..lineTo(9.3, 2.6)
+          ..lineTo(10.2, 4.4),
+        stroke,
+      )
+      ..drawRRect(
+        RRect.fromLTRBR(1.8, 4.4, 14.2, 13.4, const Radius.circular(1.6)),
+        stroke,
+      )
+      ..drawCircle(const Offset(8, 8.9), 2.6, stroke);
+  }
+
+  /// A stopwatch, for a delayed capture.
+  static void timer(Canvas canvas, Paint stroke) {
+    canvas
+      ..drawCircle(const Offset(8, 9.4), 4.6, stroke)
+      ..drawLine(const Offset(8, 4.8), const Offset(8, 2.8), stroke)
+      ..drawLine(const Offset(6.2, 2.8), const Offset(9.8, 2.8), stroke)
+      ..drawLine(const Offset(8, 9.4), const Offset(8, 6.4), stroke);
+  }
+
+  /// Two corner marks, the way a photographic crop has always been shown.
+  static void crop(Canvas canvas, Paint stroke) {
+    canvas
+      ..drawPath(
+        Path()
+          ..moveTo(4.6, 1.8)
+          ..lineTo(4.6, 11.4)
+          ..lineTo(14.2, 11.4),
+        stroke,
+      )
+      ..drawPath(
+        Path()
+          ..moveTo(1.8, 4.6)
+          ..lineTo(11.4, 4.6)
+          ..lineTo(11.4, 14.2),
+        stroke,
+      );
+  }
+
+  static void rectangle(Canvas canvas, Paint stroke) {
+    canvas.drawRRect(
+      RRect.fromLTRBR(2.4, 4, 13.6, 12, const Radius.circular(1)),
+      stroke,
+    );
+  }
+
+  static void ellipse(Canvas canvas, Paint stroke) {
+    canvas.drawOval(const Rect.fromLTRB(2.4, 4, 13.6, 12), stroke);
+  }
+
+  static void line(Canvas canvas, Paint stroke) {
+    canvas.drawLine(const Offset(2.8, 13.2), const Offset(13.2, 2.8), stroke);
+  }
+
+  /// A diagonal arrow — the annotation kind. The existing [arrowLeft] and
+  /// [arrowRight] are horizontal and belong to navigation; an arrow tool that
+  /// only ever pointed sideways would be a strange thing to offer.
+  static void arrow(Canvas canvas, Paint stroke) {
+    canvas
+      ..drawLine(const Offset(2.8, 13.2), const Offset(13.2, 2.8), stroke)
+      ..drawPath(
+        Path()
+          ..moveTo(8.2, 2.8)
+          ..lineTo(13.2, 2.8)
+          ..lineTo(13.2, 7.8),
+        stroke,
+      );
+  }
+
+  /// A droplet: the mark every image editor uses for a blur.
+  static void blur(Canvas canvas, Paint stroke) {
+    canvas.drawPath(
+      Path()
+        ..moveTo(8, 2.4)
+        ..cubicTo(8, 2.4, 3.4, 7.8, 3.4, 10.1)
+        ..cubicTo(3.4, 12.7, 5.5, 13.9, 8, 13.9)
+        ..cubicTo(10.5, 13.9, 12.6, 12.7, 12.6, 10.1)
+        ..cubicTo(12.6, 7.8, 8, 2.4, 8, 2.4)
+        ..close(),
+      stroke,
+    );
+  }
+
+  /// A mosaic. The cells are filled in a checker rather than left as a bare
+  /// grid, which is what keeps it from reading as [table].
+  static void pixelate(Canvas canvas, Paint stroke) {
+    const origin = 2.6;
+    const cell = 3.6;
+    final fill = Paint()
+      ..color = stroke.color
+      ..style = PaintingStyle.fill;
+    for (var row = 0; row < 3; row++) {
+      for (var column = 0; column < 3; column++) {
+        if ((row + column).isOdd) continue;
+        canvas.drawRect(
+          Rect.fromLTWH(
+            origin + column * cell,
+            origin + row * cell,
+            cell,
+            cell,
+          ),
+          fill,
+        );
+      }
+    }
+    canvas.drawRect(Rect.fromLTWH(origin, origin, cell * 3, cell * 3), stroke);
+  }
+
+  /// A numbered step marker: a filled disc with the numeral knocked out of it.
+  ///
+  /// Drawn solid rather than as a ring with a digit inside, for two reasons.
+  /// [info] is already a ring with a vertical stroke through it, and at fifteen
+  /// pixels a ringed "1" is the same picture. And a filled disc with a white
+  /// numeral is what the tool actually stamps on an image, so the glyph is the
+  /// mark rather than a description of it. Negative space survives being small
+  /// where a third thin stroke inside a ring does not.
+  static void stepBadge(Canvas canvas, Paint stroke) {
+    final numeral = Path()
+      ..addRect(const Rect.fromLTRB(7.2, 4.4, 8.9, 11.6))
+      ..addRect(const Rect.fromLTRB(5.6, 10.2, 10.5, 11.6))
+      ..addPath(
+        Path()
+          ..moveTo(7.2, 4.4)
+          ..lineTo(7.2, 7.1)
+          ..lineTo(5.5, 6.4)
+          ..close(),
+        Offset.zero,
+      );
+    canvas.drawPath(
+      Path.combine(
+        PathOperation.difference,
+        Path()
+          ..addOval(Rect.fromCircle(center: const Offset(8, 8), radius: 6.4)),
+        numeral,
+      ),
+      Paint()
+        ..color = stroke.color
+        ..isAntiAlias = true,
+    );
+  }
 }
 
 /// Renders a [SlateIconDraw] at a given size and colour.

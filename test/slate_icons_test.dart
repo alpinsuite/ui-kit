@@ -92,6 +92,19 @@ const Map<String, SlateIconDraw> _glyphs = <String, SlateIconDraw>{
   'pilcrow': SlateIcons.pilcrow,
   'ruler': SlateIcons.ruler,
   'clearFormat': SlateIcons.clearFormat,
+  'cursor': SlateIcons.cursor,
+  'regionSelect': SlateIcons.regionSelect,
+  'monitor': SlateIcons.monitor,
+  'camera': SlateIcons.camera,
+  'timer': SlateIcons.timer,
+  'crop': SlateIcons.crop,
+  'rectangle': SlateIcons.rectangle,
+  'ellipse': SlateIcons.ellipse,
+  'line': SlateIcons.line,
+  'arrow': SlateIcons.arrow,
+  'blur': SlateIcons.blur,
+  'pixelate': SlateIcons.pixelate,
+  'stepBadge': SlateIcons.stepBadge,
 };
 
 void main() {

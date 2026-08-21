@@ -9,6 +9,24 @@ and the package uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
+- Thirteen glyphs for capture and annotation, on the existing 16-unit grid:
+  `cursor`, `regionSelect`, `monitor`, `camera`, `timer`, `crop`, `rectangle`,
+  `ellipse`, `line`, `arrow`, `blur`, `pixelate` and `stepBadge`. `arrow` is the
+  diagonal, annotation kind — `arrowLeft` and `arrowRight` are horizontal and
+  belong to navigation, and an arrow tool that only ever pointed sideways would
+  be a strange thing to offer.
+
+  Two were drawn twice. `stepBadge` began as a ring with a "1" inside it and was
+  indistinguishable from `info`, which is already a ring with a vertical stroke
+  through it; it is now a filled disc with the numeral knocked out, which is
+  also what the tool it names actually stamps on an image. And `pixelate` began
+  as a bare 3x3 grid, which is `table`; filling the cells in a checker is what
+  makes it a mosaic.
+
+  No eraser. A rubber at sixteen pixels is a smudge — the same reason
+  `clearFormat` is a cross — and in an editor where a mark stays an object,
+  removing one is `trash`.
+
 - `SlateColorButton` and `SlateColorPopover`, with `SlateSwatches` for the
   default grid. The button is two halves, which is the whole point: the swatch
   applies the colour it is showing, the chevron beside it opens the grid — one
