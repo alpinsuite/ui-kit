@@ -25,6 +25,11 @@ and the package uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   The kit does not know what the colour is for. "No colour" is a label and a
   callback, so it means automatic ink to a text tool and no fill to a shape
   tool, and the caller can replace the whole grid.
+- A `SlateDialog`'s actions wrap instead of overflowing. A dialog has a fixed
+  width, and a `Row` of three buttons with real words in them does not always
+  fit — the "Save before closing?" dialog overflowed by 27 pixels, which is
+  silent in release and a stripe of red in debug. It behaves exactly like a Row
+  whenever they do fit.
 - Twenty glyphs for text editing, all on the existing 16-unit grid:
   `strikethrough`, `numberedList`, `multilevelList`, `alignJustify`, `table`,
   `image`, `pageBreak`, `fontColor`, `highlight`, `comment`, `trackChanges`,

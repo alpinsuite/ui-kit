@@ -55,14 +55,17 @@ class SlateDialog extends StatelessWidget {
             const SlateSeparator(),
             Padding(
               padding: const EdgeInsets.all(10),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: <Widget>[
-                  for (final action in actions) ...<Widget>[
-                    if (action != actions.first) const SizedBox(width: 8),
-                    action,
-                  ],
-                ],
+              // A Wrap, not a Row: a dialog has a fixed width and three
+              // buttons with real labels in them do not always fit inside it.
+              // A Row overflows — silently in release, and as a stripe of red
+              // in debug — where this puts the last button on a second line
+              // and stays readable. It behaves exactly like a Row whenever
+              // they do fit, which is most of the time.
+              child: Wrap(
+                alignment: WrapAlignment.end,
+                spacing: 8,
+                runSpacing: 8,
+                children: actions,
               ),
             ),
           ],

@@ -158,4 +158,31 @@ void main() {
       );
     });
   });
+
+  testWidgets('three buttons with real labels do not overflow', (tester) async {
+    // A dialog has a fixed width, and a Row of three buttons with words in
+    // them does not always fit inside it. Overflow is silent in release and a
+    // stripe of red in debug; neither is acceptable in the dialog that asks
+    // whether to save before closing.
+    await tester.pumpWidget(
+      wrap(
+        SlateDialog(
+          title: 'Save before closing?',
+          content: const Text('Everything since the last save will be lost.'),
+          actions: <Widget>[
+            SlateButton(label: 'Cancel', onPressed: () {}),
+            SlateButton(label: "Don't save", onPressed: () {}),
+            SlateButton(
+              label: 'Save',
+              kind: SlateButtonKind.primary,
+              onPressed: () {},
+            ),
+          ],
+        ),
+      ),
+    );
+
+    expect(tester.takeException(), isNull);
+    expect(find.text("Don't save"), findsOneWidget);
+  });
 }
