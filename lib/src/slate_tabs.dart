@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/gestures.dart' show kDoubleTapTimeout;
 import 'package:flutter/material.dart';
 
+import 'slate_focus.dart';
 import 'slate_icons.dart';
 import 'slate_theme.dart';
 
@@ -250,56 +251,59 @@ class _TabState extends State<_Tab> {
       cursor: SystemMouseCursors.click,
       onEnter: (_) => setState(() => _hover = true),
       onExit: (_) => setState(() => _hover = false),
-      child: GestureDetector(
-        behavior: HitTestBehavior.opaque,
-        onTap: _handleTap,
-        child: Tooltip(
-          message: widget.tab.tooltip ?? widget.tab.label,
-          child: Semantics(
-            label: widget.tab.label,
-            button: true,
-            selected: widget.selected,
-            child: Container(
-              height: theme.metrics.tabHeight,
-              constraints: const BoxConstraints(maxWidth: 220),
-              padding: EdgeInsets.symmetric(horizontal: theme.metrics.pad),
-              decoration: BoxDecoration(
-                color: background,
-                border: Border(
-                  right: BorderSide(color: palette.separator),
-                  // The selected tab is joined to the view below it by the
-                  // accent rule on top, which is what makes the two read as one
-                  // surface rather than a card floating over a bar.
-                  top: BorderSide(
-                    color: widget.selected
-                        ? palette.accent
-                        : const Color(0x00000000),
-                    width: 2,
-                  ),
-                ),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: <Widget>[
-                  if (widget.tab.leading case final leading?) ...<Widget>[
-                    SlateIcon(leading, size: 12, color: palette.inkDim),
-                    SizedBox(width: theme.metrics.gap / 2),
-                  ],
-                  Flexible(
-                    child: Text(
-                      widget.tab.label,
-                      overflow: TextOverflow.ellipsis,
-                      style: theme.textStyle.copyWith(
-                        color: widget.selected ? null : palette.inkDim,
-                        fontStyle: widget.tab.preview
-                            ? FontStyle.italic
-                            : FontStyle.normal,
-                      ),
+      child: SlateFocusable(
+        onPressed: _handleTap,
+        child: GestureDetector(
+          behavior: HitTestBehavior.opaque,
+          onTap: _handleTap,
+          child: Tooltip(
+            message: widget.tab.tooltip ?? widget.tab.label,
+            child: Semantics(
+              label: widget.tab.label,
+              button: true,
+              selected: widget.selected,
+              child: Container(
+                height: theme.metrics.tabHeight,
+                constraints: const BoxConstraints(maxWidth: 220),
+                padding: EdgeInsets.symmetric(horizontal: theme.metrics.pad),
+                decoration: BoxDecoration(
+                  color: background,
+                  border: Border(
+                    right: BorderSide(color: palette.separator),
+                    // The selected tab is joined to the view below it by the
+                    // accent rule on top, which is what makes the two read as one
+                    // surface rather than a card floating over a bar.
+                    top: BorderSide(
+                      color: widget.selected
+                          ? palette.accent
+                          : const Color(0x00000000),
+                      width: 2,
                     ),
                   ),
-                  SizedBox(width: theme.metrics.gap / 2),
-                  affordance,
-                ],
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: <Widget>[
+                    if (widget.tab.leading case final leading?) ...<Widget>[
+                      SlateIcon(leading, size: 12, color: palette.inkDim),
+                      SizedBox(width: theme.metrics.gap / 2),
+                    ],
+                    Flexible(
+                      child: Text(
+                        widget.tab.label,
+                        overflow: TextOverflow.ellipsis,
+                        style: theme.textStyle.copyWith(
+                          color: widget.selected ? null : palette.inkDim,
+                          fontStyle: widget.tab.preview
+                              ? FontStyle.italic
+                              : FontStyle.normal,
+                        ),
+                      ),
+                    ),
+                    SizedBox(width: theme.metrics.gap / 2),
+                    affordance,
+                  ],
+                ),
               ),
             ),
           ),

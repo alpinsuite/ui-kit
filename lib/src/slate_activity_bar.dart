@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'slate_focus.dart';
 import 'slate_icons.dart';
 import 'slate_theme.dart';
 
@@ -86,40 +87,46 @@ class SlateActivityBar extends StatelessWidget {
     final theme = context.slate;
     final palette = theme.palette;
 
-    return Container(
-      width: theme.metrics.activityBarWidth,
-      decoration: BoxDecoration(
-        color: palette.chrome,
-        border: Border(right: BorderSide(color: palette.separator)),
-      ),
-      child: Column(
-        children: <Widget>[
-          // Scrolls rather than overflowing. A window short enough to run out
-          // of rail is unusual but not impossible — a laptop in a split
-          // workspace reaches it — and a rail that overflows drops its last
-          // destinations off the bottom with no way to reach them.
-          Expanded(
-            child: SingleChildScrollView(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: <Widget>[
-                  for (var i = 0; i < items.length; i++)
-                    _ActivityButton(
-                      item: items[i],
-                      selected: i == selectedIndex,
-                      onPressed: () => onSelected(i),
-                    ),
-                ],
+    // A group of its own, or the rail is not a rail to the keyboard. Traversal
+    // is geometric by default, so a rail down the left edge interleaves with
+    // whatever is beside it — the first destination, then a whole toolbar, then
+    // the second destination — and `Tab` never walks the rail as one thing.
+    return FocusTraversalGroup(
+      child: Container(
+        width: theme.metrics.activityBarWidth,
+        decoration: BoxDecoration(
+          color: palette.chrome,
+          border: Border(right: BorderSide(color: palette.separator)),
+        ),
+        child: Column(
+          children: <Widget>[
+            // Scrolls rather than overflowing. A window short enough to run out
+            // of rail is unusual but not impossible — a laptop in a split
+            // workspace reaches it — and a rail that overflows drops its last
+            // destinations off the bottom with no way to reach them.
+            Expanded(
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: <Widget>[
+                    for (var i = 0; i < items.length; i++)
+                      _ActivityButton(
+                        item: items[i],
+                        selected: i == selectedIndex,
+                        onPressed: () => onSelected(i),
+                      ),
+                  ],
+                ),
               ),
             ),
-          ),
-          for (var i = 0; i < footerItems.length; i++)
-            _ActivityButton(
-              item: footerItems[i],
-              selected: false,
-              onPressed: () => onFooterSelected?.call(i),
-            ),
-        ],
+            for (var i = 0; i < footerItems.length; i++)
+              _ActivityButton(
+                item: footerItems[i],
+                selected: false,
+                onPressed: () => onFooterSelected?.call(i),
+              ),
+          ],
+        ),
       ),
     );
   }
@@ -163,64 +170,70 @@ class _ActivityButtonState extends State<_ActivityButton> {
             : SystemMouseCursors.basic,
         onEnter: (_) => setState(() => _hover = true),
         onExit: (_) => setState(() => _hover = false),
-        child: GestureDetector(
-          behavior: HitTestBehavior.opaque,
-          onTap: widget.item.enabled ? widget.onPressed : null,
-          child: Semantics(
-            label: widget.item.tooltip,
-            button: true,
-            selected: widget.selected,
-            enabled: widget.item.enabled,
-            child: SizedBox(
-              width: width,
-              height: width,
-              child: Stack(
-                children: <Widget>[
-                  if (widget.selected)
-                    Positioned(
-                      left: 0,
-                      top: 0,
-                      bottom: 0,
-                      child: Container(width: 2, color: palette.accent),
-                    ),
-                  Center(
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: <Widget>[
-                        SlateIcon(
-                          widget.item.icon,
-                          size: theme.metrics.iconSize + 3,
-                          color: foreground,
-                        ),
-                        if (widget.item.label case final label?) ...<Widget>[
-                          SizedBox(height: theme.metrics.gap / 4),
-                          Padding(
-                            padding: EdgeInsets.symmetric(
-                              horizontal: theme.metrics.gap / 4,
-                            ),
-                            child: Text(
-                              label,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              textAlign: TextAlign.center,
-                              style: theme.textStyle.copyWith(
-                                color: foreground,
-                                fontSize: theme.metrics.smallFontSize,
-                                height: 1.1,
+        // A stop per destination, unlike a list or a tree: there are a handful
+        // of them, they are the top level of the whole window, and the first
+        // thing a keyboard user needs is a way to move between panes at all.
+        child: SlateFocusable(
+          onPressed: widget.item.enabled ? widget.onPressed : null,
+          child: GestureDetector(
+            behavior: HitTestBehavior.opaque,
+            onTap: widget.item.enabled ? widget.onPressed : null,
+            child: Semantics(
+              label: widget.item.tooltip,
+              button: true,
+              selected: widget.selected,
+              enabled: widget.item.enabled,
+              child: SizedBox(
+                width: width,
+                height: width,
+                child: Stack(
+                  children: <Widget>[
+                    if (widget.selected)
+                      Positioned(
+                        left: 0,
+                        top: 0,
+                        bottom: 0,
+                        child: Container(width: 2, color: palette.accent),
+                      ),
+                    Center(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: <Widget>[
+                          SlateIcon(
+                            widget.item.icon,
+                            size: theme.metrics.iconSize + 3,
+                            color: foreground,
+                          ),
+                          if (widget.item.label case final label?) ...<Widget>[
+                            SizedBox(height: theme.metrics.gap / 4),
+                            Padding(
+                              padding: EdgeInsets.symmetric(
+                                horizontal: theme.metrics.gap / 4,
+                              ),
+                              child: Text(
+                                label,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                textAlign: TextAlign.center,
+                                style: theme.textStyle.copyWith(
+                                  color: foreground,
+                                  fontSize: theme.metrics.smallFontSize,
+                                  height: 1.1,
+                                ),
                               ),
                             ),
-                          ),
+                          ],
                         ],
-                      ],
+                      ),
                     ),
-                  ),
-                  if (widget.item.badge != null)
-                    Positioned(
-                      right: 6,
-                      top: 8,
-                      child: _Badge(text: widget.item.badge!),
-                    ),
-                ],
+                    if (widget.item.badge != null)
+                      Positioned(
+                        right: 6,
+                        top: 8,
+                        child: _Badge(text: widget.item.badge!),
+                      ),
+                  ],
+                ),
               ),
             ),
           ),

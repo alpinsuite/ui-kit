@@ -194,6 +194,11 @@ class _SlateScrollbarState extends State<SlateScrollbar> {
 
             return GestureDetector(
               behavior: HitTestBehavior.opaque,
+              // A scrollbar is a pointer affordance. The scrollable it belongs
+              // to already exposes scroll actions, so announcing this as an
+              // unlabelled tappable thing adds a stop on the reading order that
+              // does nothing and can be described as nothing.
+              excludeFromSemantics: true,
               onTapDown: (TapDownDetails details) {
                 if (thumb == null) return;
                 final double at = horizontal

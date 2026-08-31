@@ -14,7 +14,7 @@ class SlateMetrics {
     this.rowHeight = 24,
     this.compactRowHeight = 21,
     this.controlHeight = 20,
-    this.fieldHeight = 22,
+    this.fieldHeight = 24,
     this.buttonHeight = 23,
     this.barHeight = 30,
     this.windowBarHeight = 36,
@@ -45,6 +45,12 @@ class SlateMetrics {
   /// Inline controls living inside a bar.
   final double controlHeight;
 
+  /// A text field's height.
+  ///
+  /// Twenty-four rather than twenty-two: WCAG 2.2's pointer-target criterion
+  /// (2.5.8, level AA) is 24×24, and a field is a target — you click it to put
+  /// a cursor in it. Two points is not a visible difference and it is the
+  /// difference between meeting that criterion and not.
   final double fieldHeight;
   final double buttonHeight;
 

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'slate_focus.dart';
 import 'slate_icons.dart';
 import 'slate_theme.dart';
 
@@ -70,13 +71,17 @@ class _SlateStatusItemState extends State<SlateStatusItem> {
       cursor: SystemMouseCursors.click,
       onEnter: (_) => setState(() => _hover = true),
       onExit: (_) => setState(() => _hover = false),
-      child: GestureDetector(
-        behavior: HitTestBehavior.opaque,
-        onTap: widget.onPressed,
-        child: Semantics(
-          label: widget.tooltip ?? widget.label,
-          button: true,
-          child: content,
+      child: SlateFocusable(
+        onPressed: widget.onPressed,
+        borderRadius: BorderRadius.circular(context.slate.metrics.radius),
+        child: GestureDetector(
+          behavior: HitTestBehavior.opaque,
+          onTap: widget.onPressed,
+          child: Semantics(
+            label: widget.tooltip ?? widget.label,
+            button: true,
+            child: content,
+          ),
         ),
       ),
     );

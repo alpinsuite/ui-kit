@@ -26,6 +26,7 @@ export 'src/slate_context_menu.dart';
 export 'src/slate_controls.dart';
 export 'src/slate_data_grid.dart';
 export 'src/slate_dialog.dart';
+export 'src/slate_focus.dart';
 export 'src/slate_icons.dart';
 export 'src/slate_menu.dart';
 export 'src/slate_metrics.dart';

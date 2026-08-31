@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'slate_focus.dart';
 import 'slate_icons.dart';
 import 'slate_menu.dart';
 import 'slate_theme.dart';
@@ -65,37 +66,42 @@ class _SlateSelectState<T> extends State<SlateSelect<T>> {
             cursor: SystemMouseCursors.click,
             onEnter: (_) => setState(() => _hover = true),
             onExit: (_) => setState(() => _hover = false),
-            child: GestureDetector(
-              behavior: HitTestBehavior.opaque,
-              onTap: () =>
+            child: SlateFocusable(
+              onPressed: () =>
                   controller.isOpen ? controller.close() : controller.open(),
-              child: Container(
-                height: theme.metrics.controlHeight,
-                constraints: BoxConstraints(minWidth: widget.minWidth),
-                padding: const EdgeInsets.symmetric(horizontal: 5),
-                decoration: BoxDecoration(
-                  color: lit ? theme.palette.hover : const Color(0x00000000),
-                  borderRadius: BorderRadius.circular(theme.metrics.radius),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: <Widget>[
-                    Flexible(
-                      child: Text(
-                        widget.labelOf(widget.value),
-                        style: theme.textStyle.copyWith(
-                          fontSize: theme.metrics.smallFontSize,
+              borderRadius: BorderRadius.circular(theme.metrics.radius),
+              child: GestureDetector(
+                behavior: HitTestBehavior.opaque,
+                onTap: () =>
+                    controller.isOpen ? controller.close() : controller.open(),
+                child: Container(
+                  height: theme.metrics.controlHeight,
+                  constraints: BoxConstraints(minWidth: widget.minWidth),
+                  padding: const EdgeInsets.symmetric(horizontal: 5),
+                  decoration: BoxDecoration(
+                    color: lit ? theme.palette.hover : const Color(0x00000000),
+                    borderRadius: BorderRadius.circular(theme.metrics.radius),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: <Widget>[
+                      Flexible(
+                        child: Text(
+                          widget.labelOf(widget.value),
+                          style: theme.textStyle.copyWith(
+                            fontSize: theme.metrics.smallFontSize,
+                          ),
+                          overflow: TextOverflow.ellipsis,
                         ),
-                        overflow: TextOverflow.ellipsis,
                       ),
-                    ),
-                    const SizedBox(width: 6),
-                    SlateIcon(
-                      SlateIcons.chevronDown,
-                      size: 11,
-                      color: theme.palette.inkDim,
-                    ),
-                  ],
+                      const SizedBox(width: 6),
+                      SlateIcon(
+                        SlateIcons.chevronDown,
+                        size: 11,
+                        color: theme.palette.inkDim,
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),

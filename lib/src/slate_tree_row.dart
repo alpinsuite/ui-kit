@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'slate_focus.dart';
 import 'slate_icons.dart';
 import 'slate_theme.dart';
 
@@ -16,6 +17,7 @@ class SlateTreeRow extends StatefulWidget {
     this.onToggle,
     this.selected = false,
     this.onTap,
+    this.focusable = false,
     this.indentGuides = true,
     this.height,
     this.semanticLabel,
@@ -33,6 +35,19 @@ class SlateTreeRow extends StatefulWidget {
 
   final bool selected;
   final VoidCallback? onTap;
+
+  /// Whether this row is a tab stop.
+  ///
+  /// Off by default, because an outline of four hundred requirements with four
+  /// hundred tab stops in it makes `Tab` useless for reaching anything past the
+  /// tree. Such a list nominates **one** — the selected row, or the first when
+  /// nothing is selected, so the tree is reachable before anything has been
+  /// chosen — and the arrows move within it once the keyboard has arrived.
+  ///
+  /// A short, fixed list whose rows are independent switches rather than
+  /// destinations is the other case, and there every row wants one: a reader
+  /// who can reach only the first switch can operate only the first switch.
+  final bool focusable;
 
   /// Hairlines down the levels above this row. They are what stops a deep
   /// outline from becoming a column of text with no visible parentage.
@@ -109,6 +124,9 @@ class _SlateTreeRowState extends State<SlateTreeRow> {
         onTap: widget.onTap,
         child: row,
       );
+      if (widget.focusable) {
+        row = SlateFocusable(onPressed: widget.onTap, child: row);
+      }
     }
 
     return MouseRegion(
@@ -121,6 +139,11 @@ class _SlateTreeRowState extends State<SlateTreeRow> {
         label: widget.semanticLabel,
         selected: widget.selected,
         expanded: expanded,
+        // Excluded when a caller has said what the row is called. Without it a
+        // screen reader announces the label *and then* every Text inside the
+        // row — "REQ-RF-044, Bandwidth. REQ-RF-044. Bandwidth." — and the whole
+        // point of `semanticLabel` is to say it once, in a sensible order.
+        excludeSemantics: widget.semanticLabel != null,
         child: row,
       ),
     );

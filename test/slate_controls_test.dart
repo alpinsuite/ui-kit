@@ -263,6 +263,32 @@ void main() {
       expect(find.text('Both'), findsOneWidget);
     });
 
+    testWidgets('shrinks to a narrow parent rather than overflowing', (
+      tester,
+    ) async {
+      // The control sizes to its labels, which is right until the parent is
+      // narrower than they are — a side panel, a split view dragged in. An
+      // overflow stripe there is not a design decision anyone made.
+      await tester.pumpWidget(
+        wrap(
+          SizedBox(
+            width: 120,
+            child: SlateSegmented<String>(
+              value: 'Week',
+              values: const <String>['Week', 'Month', 'Agenda'],
+              labelOf: (value) => value,
+              onChanged: (_) {},
+            ),
+          ),
+        ),
+      );
+
+      expect(tester.takeException(), isNull);
+      // Every option is still there to be tapped, ellipsised rather than gone.
+      expect(find.text('Week'), findsOneWidget);
+      expect(find.text('Agenda'), findsOneWidget);
+    });
+
     testWidgets('reports the option that was tapped', (tester) async {
       String? chosen;
       await tester.pumpWidget(

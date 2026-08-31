@@ -104,7 +104,12 @@ class SlatePalette {
     border: Color(0xFFDDE1E7),
     separator: Color(0xFFE7EAEF),
     ink: Color(0xFF22262C),
-    inkDim: Color(0xFF6B747F),
+    // 5.27:1 on `panel`, 5.13 on `chrome`, 4.90 on `hover`, 5.01 on
+    // `selected`. The previous value, 0xFF6B747F, measured 4.42 on panel —
+    // under WCAG AA's 4.5 for text this size, and this is the colour every
+    // path, date and label in an application is drawn in, which is exactly the
+    // text somebody with poor vision most needs to read.
+    inkDim: Color(0xFF5F6874),
     accent: Color(0xFFA8681A),
     onAccent: Color(0xFFFFFFFF),
     hover: Color(0xFFEDEFF3),

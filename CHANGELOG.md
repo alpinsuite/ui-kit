@@ -7,8 +7,61 @@ and the package uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Fixed
+
+- **Every control in the kit was invisible to `Tab`.** They were bare
+  `GestureDetector`s, so a window built out of them had no keyboard path
+  through it at all — the only tab stops an application got were the text
+  fields Flutter makes focusable by itself. `SlateButton`, `SlateIconButton`,
+  `SlateCheckbox`, `SlateSegmented`, `SlateSelect`, `SlateTabStrip`,
+  `SlateStatusItem` and `SlateActivityBar` are now reachable, and `Enter` and
+  `Space` both press what the keyboard is on.
+
+  Nothing changes for a mouse. Flutter shows the ring only for keyboard focus,
+  so clicking a button does not leave one behind it, which is the thing that
+  makes rings look like noise and gets them removed again.
+
+  Four things are still unreachable and are named here rather than left to be
+  discovered: `SlateDataGrid` rows, the swatches in `SlateColorField`, the
+  items in `SlateMenu` and `SlateContextMenu`, and the drag handles of
+  `SlateSplitView` and `SlateScrollbar`. The first two need a roving stop and
+  therefore an API decision about who nominates it; the menus need arrow
+  navigation inside an overlay, which is a different mechanism from a tab
+  stop; a resize handle needs a keyboard gesture, not a press.
+
+- `SlateSegmented` no longer overflows a parent narrower than its labels. It
+  still sizes to its content, but each segment can now shrink and its label
+  ellipsises, so a control in a side panel truncates instead of showing an
+  overflow stripe. Found by a side panel whose options grew by one word.
+
 ### Added
 
+- `SlateFocusable`, the wrapper the above is built out of, exported so an
+  application can make its own controls reachable the same way. A disabled
+  control — `onPressed: null`, as everywhere in this kit — is deliberately not
+  a tab stop: landing on something that cannot be activated is a dead end the
+  reader has to tab out of.
+
+  The ring is drawn as an overlay inside the control's own bounds rather than
+  as a border around it, so it costs no space. A `Container` with a border
+  insets its child, which would have made every control in the kit two pixels
+  taller than `SlateMetrics` says — permanently, not only while focused.
+
+- `SlateTreeRow.focusable`, off by default. A long outline gets **one** tab
+  stop, not one per row: four hundred rows with four hundred stops in them make
+  `Tab` useless for reaching anything past the tree, so the caller nominates
+  the selected row, or the first when nothing is selected. A short list of
+  independent switches marks every row instead — a reader who can reach only
+  the first switch can operate only the first switch.
+
+- `SlateActivityBar` is a `FocusTraversalGroup`. Traversal is geometric, and a
+  rail down the left edge spans every band the panes beside it occupy, so `Tab`
+  went: first destination, the whole toolbar next to it, second destination.
+  The group keeps the rail together, and it sorts first because it is leftmost.
+
+- `SlateIcons.upload`, the mirror of `download` — the same tray with the arrow
+  reversed. The pair is only legible as a pair: an upload drawn with a different
+  tray reads as a different kind of action.
 - Thirteen glyphs for capture and annotation, on the existing 16-unit grid:
   `cursor`, `regionSelect`, `monitor`, `camera`, `timer`, `crop`, `rectangle`,
   `ellipse`, `line`, `arrow`, `blur`, `pixelate` and `stepBadge`. `arrow` is the

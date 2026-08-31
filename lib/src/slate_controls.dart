@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import 'slate_focus.dart';
 import 'slate_icons.dart';
 import 'slate_theme.dart';
 
@@ -75,41 +76,47 @@ class _SlateButtonState extends State<SlateButton> {
       cursor: enabled ? SystemMouseCursors.click : SystemMouseCursors.basic,
       onEnter: (_) => setState(() => _hover = true),
       onExit: (_) => setState(() => _hover = false),
-      child: GestureDetector(
-        behavior: HitTestBehavior.opaque,
-        onTap: widget.onPressed,
-        child: Container(
-          height: theme.metrics.buttonHeight,
-          padding: EdgeInsets.symmetric(
-            horizontal: widget.kind == SlateButtonKind.ghost ? 8 : 13,
-          ),
-          decoration: BoxDecoration(
-            color: background,
-            borderRadius: BorderRadius.circular(theme.metrics.radius),
-            border: borderColor == null ? null : Border.all(color: borderColor),
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              if (widget.icon != null) ...<Widget>[
-                SlateIcon(
-                  widget.icon!,
-                  size: 13,
-                  color: widget.iconColor ?? foreground,
+      child: SlateFocusable(
+        onPressed: widget.onPressed,
+        borderRadius: BorderRadius.circular(theme.metrics.radius),
+        child: GestureDetector(
+          behavior: HitTestBehavior.opaque,
+          onTap: widget.onPressed,
+          child: Container(
+            height: theme.metrics.buttonHeight,
+            padding: EdgeInsets.symmetric(
+              horizontal: widget.kind == SlateButtonKind.ghost ? 8 : 13,
+            ),
+            decoration: BoxDecoration(
+              color: background,
+              borderRadius: BorderRadius.circular(theme.metrics.radius),
+              border: borderColor == null
+                  ? null
+                  : Border.all(color: borderColor),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                if (widget.icon != null) ...<Widget>[
+                  SlateIcon(
+                    widget.icon!,
+                    size: 13,
+                    color: widget.iconColor ?? foreground,
+                  ),
+                  const SizedBox(width: 6),
+                ],
+                Text(
+                  widget.label,
+                  style: theme.textStyle.copyWith(
+                    color: widget.iconColor ?? foreground,
+                    fontSize: theme.metrics.smallFontSize,
+                    fontWeight: widget.kind == SlateButtonKind.primary
+                        ? FontWeight.w600
+                        : FontWeight.w400,
+                  ),
                 ),
-                const SizedBox(width: 6),
               ],
-              Text(
-                widget.label,
-                style: theme.textStyle.copyWith(
-                  color: widget.iconColor ?? foreground,
-                  fontSize: theme.metrics.smallFontSize,
-                  fontWeight: widget.kind == SlateButtonKind.primary
-                      ? FontWeight.w600
-                      : FontWeight.w400,
-                ),
-              ),
-            ],
+            ),
           ),
         ),
       ),
@@ -175,30 +182,34 @@ class _SlateIconButtonState extends State<SlateIconButton> {
         cursor: enabled ? SystemMouseCursors.click : SystemMouseCursors.basic,
         onEnter: (_) => setState(() => _hover = true),
         onExit: (_) => setState(() => _hover = false),
-        child: GestureDetector(
-          behavior: HitTestBehavior.opaque,
-          onTap: widget.onPressed,
-          child: Semantics(
-            label: widget.tooltip,
-            button: true,
-            selected: widget.selected,
-            child: Container(
-              width: side,
-              height: side,
-              alignment: Alignment.center,
-              decoration: BoxDecoration(
-                color: background,
-                borderRadius: BorderRadius.circular(theme.metrics.radius),
-              ),
-              child: SlateIcon(
-                widget.icon,
-                color: !enabled
-                    ? palette.inkDim.withValues(alpha: 0.4)
-                    : widget.danger && _hover
-                    ? const Color(0xFFFFFFFF)
-                    : widget.selected
-                    ? palette.accent
-                    : palette.inkDim,
+        child: SlateFocusable(
+          onPressed: widget.onPressed,
+          borderRadius: BorderRadius.circular(theme.metrics.radius),
+          child: GestureDetector(
+            behavior: HitTestBehavior.opaque,
+            onTap: widget.onPressed,
+            child: Semantics(
+              label: widget.tooltip,
+              button: true,
+              selected: widget.selected,
+              child: Container(
+                width: side,
+                height: side,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color: background,
+                  borderRadius: BorderRadius.circular(theme.metrics.radius),
+                ),
+                child: SlateIcon(
+                  widget.icon,
+                  color: !enabled
+                      ? palette.inkDim.withValues(alpha: 0.4)
+                      : widget.danger && _hover
+                      ? const Color(0xFFFFFFFF)
+                      : widget.selected
+                      ? palette.accent
+                      : palette.inkDim,
+                ),
               ),
             ),
           ),
@@ -235,49 +246,55 @@ class _SlateCheckboxState extends State<SlateCheckbox> {
       cursor: SystemMouseCursors.click,
       onEnter: (_) => setState(() => _hover = true),
       onExit: (_) => setState(() => _hover = false),
-      child: GestureDetector(
-        behavior: HitTestBehavior.opaque,
-        // The label is part of the target: a 13px box is a mean thing to ask
-        // anyone to hit.
-        onTap: () => widget.onChanged(!widget.value),
-        child: Semantics(
-          checked: widget.value,
-          label: widget.label,
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              Container(
-                width: 13,
-                height: 13,
-                alignment: Alignment.center,
-                decoration: BoxDecoration(
-                  color: widget.value ? palette.accent : palette.field,
-                  border: Border.all(
-                    color: widget.value
-                        ? palette.accent
-                        : _hover
-                        ? palette.inkDim
-                        : palette.fieldBorder,
+      child: SlateFocusable(
+        onPressed: () => widget.onChanged(!widget.value),
+        borderRadius: BorderRadius.circular(theme.metrics.radius),
+        child: GestureDetector(
+          behavior: HitTestBehavior.opaque,
+          // The label is part of the target: a 13px box is a mean thing to ask
+          // anyone to hit.
+          onTap: () => widget.onChanged(!widget.value),
+          child: Semantics(
+            checked: widget.value,
+            label: widget.label,
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                Container(
+                  width: 13,
+                  height: 13,
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                    color: widget.value ? palette.accent : palette.field,
+                    border: Border.all(
+                      color: widget.value
+                          ? palette.accent
+                          : _hover
+                          ? palette.inkDim
+                          : palette.fieldBorder,
+                    ),
+                    borderRadius: BorderRadius.circular(
+                      theme.metrics.radius - 1,
+                    ),
                   ),
-                  borderRadius: BorderRadius.circular(theme.metrics.radius - 1),
+                  child: widget.value
+                      ? SlateIcon(
+                          SlateIcons.check,
+                          size: 10,
+                          color: palette.onAccent,
+                          weight: 2,
+                        )
+                      : null,
                 ),
-                child: widget.value
-                    ? SlateIcon(
-                        SlateIcons.check,
-                        size: 10,
-                        color: palette.onAccent,
-                        weight: 2,
-                      )
-                    : null,
-              ),
-              const SizedBox(width: 7),
-              Text(
-                widget.label,
-                style: theme.textStyle.copyWith(
-                  fontSize: theme.metrics.smallFontSize,
+                const SizedBox(width: 7),
+                Text(
+                  widget.label,
+                  style: theme.textStyle.copyWith(
+                    fontSize: theme.metrics.smallFontSize,
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
@@ -316,16 +333,23 @@ class SlateSegmented<T> extends StatelessWidget {
         borderRadius: BorderRadius.circular(theme.metrics.radius),
       ),
       clipBehavior: Clip.antiAlias,
+      // `min` so the control is only as wide as its labels, but each segment is
+      // `Flexible` so that when the parent is narrower than that the labels
+      // shrink and ellipsize rather than the Row overflowing. An overflow
+      // stripe is not a design decision anyone made — it is what happens when
+      // nobody decided.
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
           for (final option in values) ...<Widget>[
             if (option != values.first)
               Container(width: 1, color: palette.fieldBorder),
-            _Segment(
-              label: labelOf(option),
-              selected: option == value,
-              onPressed: () => onChanged(option),
+            Flexible(
+              child: _Segment(
+                label: labelOf(option),
+                selected: option == value,
+                onPressed: () => onChanged(option),
+              ),
             ),
           ],
         ],
@@ -360,23 +384,28 @@ class _SegmentState extends State<_Segment> {
       cursor: SystemMouseCursors.click,
       onEnter: (_) => setState(() => _hover = true),
       onExit: (_) => setState(() => _hover = false),
-      child: GestureDetector(
-        behavior: HitTestBehavior.opaque,
-        onTap: widget.onPressed,
-        child: Container(
-          height: double.infinity,
-          padding: const EdgeInsets.symmetric(horizontal: 12),
-          alignment: Alignment.center,
-          color: widget.selected
-              ? palette.selected
-              : _hover
-              ? palette.hover
-              : const Color(0x00000000),
-          child: Text(
-            widget.label,
-            style: theme.textStyle.copyWith(
-              fontSize: theme.metrics.smallFontSize,
-              color: widget.selected ? palette.accent : palette.inkDim,
+      child: SlateFocusable(
+        onPressed: widget.onPressed,
+        child: GestureDetector(
+          behavior: HitTestBehavior.opaque,
+          onTap: widget.onPressed,
+          child: Container(
+            height: double.infinity,
+            padding: const EdgeInsets.symmetric(horizontal: 12),
+            alignment: Alignment.center,
+            color: widget.selected
+                ? palette.selected
+                : _hover
+                ? palette.hover
+                : const Color(0x00000000),
+            child: Text(
+              widget.label,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: theme.textStyle.copyWith(
+                fontSize: theme.metrics.smallFontSize,
+                color: widget.selected ? palette.accent : palette.inkDim,
+              ),
             ),
           ),
         ),

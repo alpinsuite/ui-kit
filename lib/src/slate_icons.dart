@@ -103,6 +103,32 @@ abstract final class SlateIcons {
     canvas.drawLine(const Offset(3.5, 8), const Offset(12.5, 8), stroke);
   }
 
+  /// An arrow out of a tray: something local is going somewhere else.
+  ///
+  /// The mirror of [download] — same tray, arrow reversed — because the pair is
+  /// only legible as a pair. An upload drawn with a different tray reads as a
+  /// different kind of action.
+  static void upload(Canvas canvas, Paint stroke) {
+    canvas
+      ..drawPath(
+        Path()
+          ..moveTo(8, 10)
+          ..lineTo(8, 2.5)
+          ..moveTo(4.5, 6)
+          ..lineTo(8, 2.5)
+          ..lineTo(11.5, 6),
+        stroke,
+      )
+      ..drawPath(
+        Path()
+          ..moveTo(3, 11.5)
+          ..lineTo(3, 13.5)
+          ..lineTo(13, 13.5)
+          ..lineTo(13, 11.5),
+        stroke,
+      );
+  }
+
   /// An arrow into a tray: something newer is available.
   static void download(Canvas canvas, Paint stroke) {
     canvas
@@ -670,6 +696,79 @@ abstract final class SlateIcons {
   }
 
   /// Bars staggered across a timeline.
+  static void envelope(Canvas canvas, Paint stroke) {
+    canvas
+      ..drawRect(const Rect.fromLTRB(2.5, 4, 13.5, 12), stroke)
+      // The flap stops just inside the top edge rather than on it, so the two
+      // strokes do not double up into a thick line at this size.
+      ..drawPath(
+        Path()
+          ..moveTo(2.5, 4.6)
+          ..lineTo(8, 8.6)
+          ..lineTo(13.5, 4.6),
+        stroke,
+      );
+  }
+
+  static void person(Canvas canvas, Paint stroke) {
+    canvas
+      ..drawCircle(const Offset(8, 5.6), 2.4, stroke)
+      ..drawPath(
+        Path()
+          ..moveTo(3.2, 13.5)
+          ..cubicTo(3.2, 10.6, 5.3, 9.6, 8, 9.6)
+          ..cubicTo(10.7, 9.6, 12.8, 10.6, 12.8, 13.5),
+        stroke,
+      );
+  }
+
+  static void reply(Canvas canvas, Paint stroke) {
+    canvas
+      ..drawPath(
+        Path()
+          ..moveTo(6.5, 3.5)
+          ..lineTo(2.5, 7)
+          ..lineTo(6.5, 10.5),
+        stroke,
+      )
+      ..drawPath(
+        Path()
+          ..moveTo(2.5, 7)
+          ..lineTo(9, 7)
+          ..cubicTo(12.2, 7, 13.5, 9.2, 13.5, 13),
+        stroke,
+      );
+  }
+
+  static void send(Canvas canvas, Paint stroke) {
+    canvas
+      ..drawPath(
+        Path()
+          ..moveTo(14, 2.5)
+          ..lineTo(2, 7.2)
+          ..lineTo(7, 9)
+          ..lineTo(8.8, 14)
+          ..close(),
+        stroke,
+      )
+      // The fold: what separates a paper plane from a triangle.
+      ..drawLine(const Offset(7, 9), const Offset(14, 2.5), stroke);
+  }
+
+  static void flag(Canvas canvas, Paint stroke) {
+    canvas
+      ..drawLine(const Offset(4, 2.5), const Offset(4, 13.5), stroke)
+      ..drawPath(
+        Path()
+          ..moveTo(4, 3.5)
+          ..lineTo(12.5, 3.5)
+          ..lineTo(10.4, 6.5)
+          ..lineTo(12.5, 9.5)
+          ..lineTo(4, 9.5),
+        stroke,
+      );
+  }
+
   static void gantt(Canvas canvas, Paint stroke) {
     canvas
       ..drawLine(const Offset(3, 4.5), const Offset(10, 4.5), stroke)

@@ -147,6 +147,18 @@ cycle waiting to happen.
 
 ## Gotchas discovered the hard way
 
+- **`tools/check_kit_purity.sh` fails wholesale on a Windows checkout**, and
+  the reason is nothing to do with the kit: `core.autocrlf` is on, so the
+  working tree is CRLF while the repository stores LF, and the script's
+  `grep -c "^export 'src/$name';$"` never matches a line ending in a carriage
+  return. Every file reads as "not exported by lib/slate_ui.dart" at once, which
+  is the tell — a real breakage names one file. Strip the carriage returns
+  from `lib/slate_ui.dart` before the grep for the true answer. CI runs on an LF
+  checkout and is not affected.
+- **The example has a `linux/` runner and no `windows/` one**, so
+  `flutter build linux --release` — the fifth check — cannot run on this
+  machine at all. `flutter test` in `example/` still can, and the nearest thing
+  to seeing the kit here is running an application that consumes it.
 - `dart format` reformats aggressively. Anchor-based patch scripts written
   against pre-format source will stop matching — read the file first.
 - A `SemanticsHandle` from `tester.ensureSemantics()` must be disposed *inside*
