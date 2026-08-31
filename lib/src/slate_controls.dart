@@ -287,10 +287,17 @@ class _SlateCheckboxState extends State<SlateCheckbox> {
                       : null,
                 ),
                 const SizedBox(width: 7),
-                Text(
-                  widget.label,
-                  style: theme.textStyle.copyWith(
-                    fontSize: theme.metrics.smallFontSize,
+                // Flexible, and ellipsized: the row is `min` so it sizes to the
+                // label, but a sentence-long label in a dialog column narrower
+                // than it is must give way rather than paint an overflow
+                // stripe. A stripe is not a design decision anyone made.
+                Flexible(
+                  child: Text(
+                    widget.label,
+                    overflow: TextOverflow.ellipsis,
+                    style: theme.textStyle.copyWith(
+                      fontSize: theme.metrics.smallFontSize,
+                    ),
                   ),
                 ),
               ],

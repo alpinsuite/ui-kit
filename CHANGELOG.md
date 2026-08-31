@@ -7,6 +7,43 @@ and the package uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+
+- **35 spreadsheet glyphs**, which is most of a spreadsheet's toolbar:
+  `paste` `cut`; `borders` `bordersOutline` `bordersNone`; `fillColor`;
+  `cellAlignTop` `cellAlignMiddle` `cellAlignBottom`; `wrapText`;
+  `mergeCells` `unmergeCells`; `percent` `currency` `commaStyle`
+  `decimalIncrease` `decimalDecrease`; `sigma` `fx`;
+  `sortAscending` `sortDescending`; `insertRow` `deleteRow`
+  `insertColumn` `deleteColumn`; `freezePanes` `gridlines`; and
+  `chartColumn` `chartBar` `chartLine` `chartArea` `chartScatter`
+  `chartPie` `chartDoughnut` `chartRadar`.
+
+  Three of them are named for what a spreadsheet means rather than for what
+  they look like, and the reasons are worth having. `cellAlign*` rather than
+  `alignTop`, because `alignLeft`/`alignCenter`/`alignRight` already own "align
+  text" here and mean the other axis. `currency` is the generic currency sign
+  `¤` and not a dollar, because the preset it labels takes its symbol from the
+  running locale and a button that prints one symbol while applying another is
+  worse than an abstract mark. `sortAscending`/`sortDescending` are bars rather
+  than A-Z, which would be a Latin alphabet baked into a glyph.
+
+  Eight chart glyphs rather than one generic chart mark, because the place they
+  are needed is a gallery offering all eight at once, where the picture is the
+  only thing telling them apart.
+
+  Six of these were drawn twice before they were right, and the contact sheet
+  is why — `fillColor` as a tipped bucket read as an eraser, a stroked
+  `commaStyle` read as a numeral 2, `freezePanes` and `gridlines` were the same
+  picture, both `mergeCells` arrowheads were drawn inside out into a diamond,
+  and `chartRadar`'s plotted series is three pixels across at a toolbar's size
+  and closes into a blot. None of that is visible in the source.
+
+- The gallery and the test map now list **the same glyphs**. Six that landed
+  with the capture-and-annotation set — `upload` `envelope` `person` `reply`
+  `send` `flag` — had never been added to `example/lib/main.dart`, so the one
+  place a person can look at the kit was quietly missing them.
+
 ### Fixed
 
 - **Every control in the kit was invisible to `Tab`.** They were bare

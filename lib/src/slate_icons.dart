@@ -1622,6 +1622,640 @@ abstract final class SlateIcons {
         ..isAntiAlias = true,
     );
   }
+
+  // Spreadsheet. A grid is the noun almost all of these are built from, and the
+  // ones that are not -- the number formats, the sigma, the fx -- are the marks
+  // a spreadsheet already prints in its own cells.
+
+  /// A clipboard with a page laid over it.
+  static void paste(Canvas canvas, Paint stroke) {
+    canvas
+      ..drawRRect(
+        RRect.fromLTRBR(2.5, 3.4, 10.4, 13.5, const Radius.circular(1)),
+        stroke,
+      )
+      ..drawRRect(
+        RRect.fromLTRBR(4.6, 1.9, 8.3, 4.4, const Radius.circular(0.8)),
+        stroke,
+      )
+      ..drawRRect(
+        RRect.fromLTRBR(7.6, 7.4, 13.5, 13.5, const Radius.circular(1)),
+        Paint()
+          ..color = stroke.color
+          ..style = PaintingStyle.fill,
+      );
+  }
+
+  /// Scissors: two blades crossed over two finger holes.
+  static void cut(Canvas canvas, Paint stroke) {
+    canvas
+      ..drawLine(const Offset(4.6, 2.4), const Offset(10.4, 10.6), stroke)
+      ..drawLine(const Offset(11.4, 2.4), const Offset(5.6, 10.6), stroke)
+      ..drawCircle(const Offset(4.6, 12.2), 1.7, stroke)
+      ..drawCircle(const Offset(11.4, 12.2), 1.7, stroke);
+  }
+
+  // Borders, as a family of three. The picture is the same four cells every
+  // time and only the weight of each edge changes, because that is the one
+  // thing the button is about: solid where the border lands, dashed where it
+  // does not. Drawn as three separate glyphs rather than one with a flag so a
+  // toolbar can put all three in a popover side by side.
+
+  /// Every edge of a two-by-two block.
+  static void borders(Canvas canvas, Paint stroke) {
+    _borderGrid(canvas, stroke, outline: true, inner: true);
+  }
+
+  /// The outside of the block, with the inner cross left off.
+  static void bordersOutline(Canvas canvas, Paint stroke) {
+    _borderGrid(canvas, stroke, outline: true, inner: false);
+  }
+
+  /// No edge at all -- the whole grid dashed.
+  static void bordersNone(Canvas canvas, Paint stroke) {
+    _borderGrid(canvas, stroke, outline: false, inner: false);
+  }
+
+  static void _borderGrid(
+    Canvas canvas,
+    Paint stroke, {
+    required bool outline,
+    required bool inner,
+  }) {
+    const a = 2.6;
+    const b = 13.4;
+    const mid = 8.0;
+    void edge(Offset from, Offset to, {required bool solid}) {
+      if (solid) {
+        canvas.drawLine(from, to, stroke);
+      } else {
+        _dashed(canvas, stroke, from, to);
+      }
+    }
+
+    edge(const Offset(a, a), const Offset(b, a), solid: outline);
+    edge(const Offset(a, b), const Offset(b, b), solid: outline);
+    edge(const Offset(a, a), const Offset(a, b), solid: outline);
+    edge(const Offset(b, a), const Offset(b, b), solid: outline);
+    edge(const Offset(a, mid), const Offset(b, mid), solid: inner);
+    edge(const Offset(mid, a), const Offset(mid, b), solid: inner);
+  }
+
+  /// A dashed run between two points, on the axis they differ in.
+  static void _dashed(Canvas canvas, Paint stroke, Offset from, Offset to) {
+    // The gap has to beat the stroke weight or the dashes bleed into each
+    // other and the run reads solid -- which is the whole distinction these
+    // three glyphs are built on.
+    const dash = 1.4;
+    const gap = 2.1;
+    final total = (to - from).distance;
+    if (total <= 0) return;
+    final step = (to - from) / total;
+    for (var at = 0.0; at < total; at += dash + gap) {
+      final end = math.min(at + dash, total);
+      canvas.drawLine(from + step * at, from + step * end, stroke);
+    }
+  }
+
+  /// A cell filling up, over a bar.
+  ///
+  /// The bar is where the current colour goes, the same arrangement
+  /// [fontColor] uses, so the two sit side by side on a toolbar and a caller
+  /// paints one swatch under either.
+  ///
+  /// A cell half full rather than a tipped bucket. The bucket is what Excel
+  /// draws, and at sixteen pixels it is an indistinct lump with a line coming
+  /// out of it -- tested, and it read as an eraser. What the button does is put
+  /// colour *in a cell*, and a cell with colour rising in it says that without
+  /// needing the reader to recognise a container at eight pixels across.
+  static void fillColor(Canvas canvas, Paint stroke) {
+    canvas
+      ..drawRect(const Rect.fromLTRB(3.4, 2.4, 12.6, 11), stroke)
+      ..drawRect(
+        const Rect.fromLTRB(3.4, 7, 12.6, 11),
+        Paint()
+          ..color = stroke.color
+          ..style = PaintingStyle.fill,
+      )
+      ..drawLine(const Offset(3, 13.4), const Offset(13, 13.4), stroke);
+  }
+
+  // Vertical alignment. A rule at the edge the text is pushed against, and the
+  // lines of text packed against it -- so the three differ in the one way the
+  // control differs, and none of them needs a letterform.
+  //
+  // `cellAlign*` rather than `alignTop`, because [alignLeft], [alignCenter] and
+  // [alignRight] already own "align text" in this kit and mean the other axis:
+  // a bare `alignTop` sitting beside them reads as the fourth member of that
+  // family rather than as a different question. Both applications that want
+  // these mean the content inside a cell -- a spreadsheet's, and a word
+  // processor's table -- so the name says cell.
+
+  /// Text against the top of its cell.
+  static void cellAlignTop(Canvas canvas, Paint stroke) {
+    _verticalAlign(
+      canvas,
+      stroke,
+      rule: 2.8,
+      lines: const <double>[5.6, 8, 10.4],
+    );
+  }
+
+  /// Text centred between the top and the bottom.
+  static void cellAlignMiddle(Canvas canvas, Paint stroke) {
+    _verticalAlign(canvas, stroke, rule: 8, lines: const <double>[4.4, 11.6]);
+  }
+
+  /// Text against the bottom of its cell.
+  static void cellAlignBottom(Canvas canvas, Paint stroke) {
+    _verticalAlign(
+      canvas,
+      stroke,
+      rule: 13.2,
+      lines: const <double>[5.6, 8, 10.4],
+    );
+  }
+
+  static void _verticalAlign(
+    Canvas canvas,
+    Paint stroke, {
+    required double rule,
+    required List<double> lines,
+  }) {
+    canvas.drawLine(Offset(2.5, rule), Offset(13.5, rule), stroke);
+    for (final y in lines) {
+      canvas.drawLine(Offset(4.2, y), Offset(11.8, y), stroke);
+    }
+  }
+
+  /// A line of text that runs out of room and turns back under itself.
+  static void wrapText(Canvas canvas, Paint stroke) {
+    canvas
+      ..drawLine(const Offset(2.5, 3.4), const Offset(13.5, 3.4), stroke)
+      ..drawPath(
+        Path()
+          ..moveTo(2.5, 8)
+          ..lineTo(11, 8)
+          ..cubicTo(13.4, 8, 13.4, 12, 11, 12)
+          ..lineTo(6.4, 12),
+        stroke,
+      )
+      ..drawPath(
+        Path()
+          ..moveTo(8.4, 10)
+          ..lineTo(6.4, 12)
+          ..lineTo(8.4, 14),
+        stroke,
+      );
+  }
+
+  // Merge, as a pair. The seam is the whole story: dashed once the two cells
+  // are one, solid while they are still two, with the arrows saying which way
+  // the press moves them.
+
+  /// Two cells becoming one: arrows inward, and no seam at all.
+  ///
+  /// The dashed seam this used to carry was one mark too many. Three things
+  /// competing for the middle four units -- two arrowheads and a dotted line --
+  /// closed into a single dark patch at working size. The arrows already say
+  /// "bring these together"; the absent seam is the result, and drawing the
+  /// result as well as the action is what made it unreadable.
+  static void mergeCells(Canvas canvas, Paint stroke) {
+    _mergeFrame(canvas, stroke, seamSolid: false, seamDrawn: false);
+    _mergeArrows(canvas, stroke, outward: false);
+  }
+
+  /// One cell becoming two: arrows outward, the seam drawn back in.
+  static void unmergeCells(Canvas canvas, Paint stroke) {
+    _mergeFrame(canvas, stroke, seamSolid: true, seamDrawn: true);
+    _mergeArrows(canvas, stroke, outward: true);
+  }
+
+  static void _mergeFrame(
+    Canvas canvas,
+    Paint stroke, {
+    required bool seamSolid,
+    required bool seamDrawn,
+  }) {
+    canvas.drawRect(const Rect.fromLTRB(2.6, 4.2, 13.4, 11.8), stroke);
+    if (!seamDrawn) return;
+    if (seamSolid) {
+      canvas.drawLine(const Offset(8, 4.2), const Offset(8, 11.8), stroke);
+    } else {
+      _dashed(canvas, stroke, const Offset(8, 4.2), const Offset(8, 11.8));
+    }
+  }
+
+  static void _mergeArrows(
+    Canvas canvas,
+    Paint stroke, {
+    required bool outward,
+  }) {
+    // Tail to head, so the arrowhead is always at the end that moves. The
+    // inward pair stops at 6.2 rather than 6.6: two arrowheads 1.4 units apart
+    // read as one diamond in the middle of the box.
+    final double leftTail = outward ? 6.2 : 3.4;
+    final double leftHead = outward ? 3.4 : 6.2;
+    canvas
+      ..drawLine(Offset(leftTail, 8), Offset(leftHead, 8), stroke)
+      ..drawLine(Offset(16 - leftTail, 8), Offset(16 - leftHead, 8), stroke);
+    for (final (tail, head) in <(double, double)>[
+      (leftTail, leftHead),
+      (16 - leftTail, 16 - leftHead),
+    ]) {
+      // Behind the tip along the direction of travel. Deriving this from which
+      // half of the box the tip sat in instead drew both heads inside out on
+      // the inward pair, which is what the diamond in the middle was.
+      final double back = head + (head > tail ? -1.6 : 1.6);
+      canvas.drawPath(
+        Path()
+          ..moveTo(back, 6.4)
+          ..lineTo(head, 8)
+          ..lineTo(back, 9.6),
+        stroke,
+      );
+    }
+  }
+
+  // Number formats. Excel's own marks, and deliberately so: a percent button
+  // that does not show a percent sign is a button nobody finds twice.
+
+  /// The percent sign.
+  static void percent(Canvas canvas, Paint stroke) {
+    canvas
+      ..drawCircle(const Offset(5.2, 5.2), 2, stroke)
+      ..drawCircle(const Offset(10.8, 10.8), 2, stroke)
+      ..drawLine(const Offset(12, 3.4), const Offset(4, 12.6), stroke);
+  }
+
+  /// The generic currency sign, U+00A4 -- a circle with four rays.
+  ///
+  /// Deliberately not a dollar, and not a banknote either. The Currency preset
+  /// takes its symbol from the running locale, so a glyph with a `$` in it is
+  /// wrong everywhere the application is not running in English, and a button
+  /// that prints one symbol while applying another is worse than an abstract
+  /// mark. `¤` is the character Unicode provides for exactly this -- a currency
+  /// whose symbol is not being named -- so the button is not being vague, it is
+  /// being accurate.
+  static void currency(Canvas canvas, Paint stroke) {
+    const centre = Offset(8, 8);
+    const radius = 3.3;
+    canvas.drawCircle(centre, radius, stroke);
+    for (var corner = 0; corner < 4; corner++) {
+      final angle = math.pi / 4 + corner * math.pi / 2;
+      final step = Offset(math.cos(angle), math.sin(angle));
+      canvas.drawLine(
+        centre + step * (radius - 0.2),
+        centre + step * (radius + 2.4),
+        stroke,
+      );
+    }
+  }
+
+  /// A comma, drawn large. The thousands separator is what the control adds,
+  /// and at this size one mark reads where a sample number would not.
+  ///
+  /// Filled -- a head and a tail -- rather than stroked as a curve. A comma
+  /// drawn as one open stroke has no weight at the top and reads as a hook or a
+  /// numeral 2; the shape people recognise is a solid head with the tail
+  /// falling away from it.
+  static void commaStyle(Canvas canvas, Paint stroke) {
+    final fill = Paint()
+      ..color = stroke.color
+      ..style = PaintingStyle.fill;
+    canvas
+      ..drawCircle(const Offset(8.1, 7), 2.4, fill)
+      ..drawPath(
+        Path()
+          ..moveTo(6.2, 8.5)
+          ..lineTo(10.3, 7.4)
+          ..cubicTo(9.9, 10.2, 8.2, 12.1, 6.1, 13.4)
+          ..close(),
+        fill,
+      );
+  }
+
+  /// A decimal point and its places, with an arrow for the direction.
+  ///
+  /// Right adds a place and left removes one, which is the reading order of
+  /// the number underneath rather than an arbitrary pairing: a digit appears
+  /// off the right-hand end.
+  static void decimalIncrease(Canvas canvas, Paint stroke) {
+    _decimal(canvas, stroke, pointingRight: true);
+  }
+
+  /// One decimal place fewer. See [decimalIncrease].
+  static void decimalDecrease(Canvas canvas, Paint stroke) {
+    _decimal(canvas, stroke, pointingRight: false);
+  }
+
+  static void _decimal(
+    Canvas canvas,
+    Paint stroke, {
+    required bool pointingRight,
+  }) {
+    final fill = Paint()
+      ..color = stroke.color
+      ..style = PaintingStyle.fill;
+    canvas
+      ..drawCircle(const Offset(3.4, 12.2), 0.9, fill)
+      ..drawOval(const Rect.fromLTRB(5.3, 8.6, 8.5, 13.6), stroke)
+      ..drawOval(const Rect.fromLTRB(9.8, 8.6, 13, 13.6), stroke);
+
+    const double tail = 4.4;
+    const double head = 11.6;
+    final double from = pointingRight ? tail : head;
+    final double to = pointingRight ? head : tail;
+    final double back = pointingRight ? to - 1.8 : to + 1.8;
+    canvas
+      ..drawLine(Offset(from, 4.2), Offset(to, 4.2), stroke)
+      ..drawPath(
+        Path()
+          ..moveTo(back, 2.6)
+          ..lineTo(to, 4.2)
+          ..lineTo(back, 5.8),
+        stroke,
+      );
+  }
+
+  /// A capital sigma: AutoSum.
+  static void sigma(Canvas canvas, Paint stroke) {
+    canvas.drawPath(
+      Path()
+        ..moveTo(11.6, 3.2)
+        ..lineTo(4.4, 3.2)
+        ..lineTo(9, 8)
+        ..lineTo(4.4, 12.8)
+        ..lineTo(11.6, 12.8),
+      stroke,
+    );
+  }
+
+  /// The *fx* mark a formula bar prints beside the box.
+  static void fx(Canvas canvas, Paint stroke) {
+    canvas
+      ..drawPath(
+        Path()
+          ..moveTo(3.4, 13.2)
+          ..lineTo(5.4, 5)
+          ..cubicTo(5.9, 2.8, 7.4, 2.4, 8.2, 3.4),
+        stroke,
+      )
+      ..drawLine(const Offset(3.2, 7), const Offset(7.4, 7), stroke)
+      ..drawLine(const Offset(9.4, 8.4), const Offset(13.4, 13.2), stroke)
+      ..drawLine(const Offset(13.4, 8.4), const Offset(9.4, 13.2), stroke);
+  }
+
+  // Sort, as bars rather than as A-Z. The letters would be a Latin alphabet
+  // baked into a glyph, in a kit whose applications are localised; three bars
+  // growing or shrinking say the same thing in every script.
+
+  /// Smallest first.
+  static void sortAscending(Canvas canvas, Paint stroke) {
+    _sort(canvas, stroke, growing: true);
+  }
+
+  /// Largest first.
+  static void sortDescending(Canvas canvas, Paint stroke) {
+    _sort(canvas, stroke, growing: false);
+  }
+
+  static void _sort(Canvas canvas, Paint stroke, {required bool growing}) {
+    const widths = <double>[2.6, 4.6, 6.6];
+    const rows = <double>[4, 8, 12];
+    for (var i = 0; i < rows.length; i++) {
+      final width = growing ? widths[i] : widths[widths.length - 1 - i];
+      canvas.drawLine(
+        Offset(6.9, rows[i]),
+        Offset(6.9 + width, rows[i]),
+        stroke,
+      );
+    }
+    canvas
+      ..drawLine(const Offset(3.4, 2.8), const Offset(3.4, 13.2), stroke)
+      ..drawPath(
+        Path()
+          ..moveTo(1.9, 11.4)
+          ..lineTo(3.4, 13.2)
+          ..lineTo(4.9, 11.4),
+        stroke,
+      );
+  }
+
+  // Insert and delete, on both axes. Two strips of the sheet, and the mark for
+  // what happens to a third: a plus where one arrives, a cross where one goes.
+  // The strips are drawn filled so the mark sits against something solid --
+  // outlined, the plus reads as a cell of the grid rather than as an action.
+
+  /// A row added above.
+  static void insertRow(Canvas canvas, Paint stroke) {
+    _strips(canvas, stroke, horizontal: true, adding: true);
+  }
+
+  /// A row taken out.
+  static void deleteRow(Canvas canvas, Paint stroke) {
+    _strips(canvas, stroke, horizontal: true, adding: false);
+  }
+
+  /// A column added to the left.
+  static void insertColumn(Canvas canvas, Paint stroke) {
+    _strips(canvas, stroke, horizontal: false, adding: true);
+  }
+
+  /// A column taken out.
+  static void deleteColumn(Canvas canvas, Paint stroke) {
+    _strips(canvas, stroke, horizontal: false, adding: false);
+  }
+
+  static void _strips(
+    Canvas canvas,
+    Paint stroke, {
+    required bool horizontal,
+    required bool adding,
+  }) {
+    for (final near in const <double>[8.8, 11.8]) {
+      final rect = horizontal
+          ? Rect.fromLTRB(2.6, near, 13.4, near + 2.4)
+          : Rect.fromLTRB(near, 2.6, near + 2.4, 13.4);
+      canvas.drawRect(rect, stroke);
+    }
+
+    // The mark goes at the free end of the axis, which is where the new strip
+    // would land: above the rows, to the left of the columns. It needs real
+    // clearance from the first strip -- at a heavy weight a mark 1.5 units off
+    // merges into it and the pair reads as one lump.
+    final centre = horizontal ? const Offset(8, 4) : const Offset(4, 8);
+    const double arm = 2.5;
+    if (adding) {
+      canvas
+        ..drawLine(centre.translate(-arm, 0), centre.translate(arm, 0), stroke)
+        ..drawLine(centre.translate(0, -arm), centre.translate(0, arm), stroke);
+    } else {
+      const double d = arm * 0.72;
+      canvas
+        ..drawLine(centre.translate(-d, -d), centre.translate(d, d), stroke)
+        ..drawLine(centre.translate(d, -d), centre.translate(-d, d), stroke);
+    }
+  }
+
+  /// A sheet split into four panes, with the held corner filled.
+  ///
+  /// The split lines alone are not enough: a frame with a cross in it is a
+  /// picture of *any* four-pane arrangement, and drawn beside [gridlines] at
+  /// sixteen pixels the two were the same glyph. Filling the corner that stays
+  /// put is the thing freezing actually does.
+  static void freezePanes(Canvas canvas, Paint stroke) {
+    canvas
+      ..drawRect(
+        const Rect.fromLTRB(2.6, 2.6, 6.3, 6.3),
+        Paint()
+          ..color = stroke.color
+          ..style = PaintingStyle.fill,
+      )
+      ..drawRect(const Rect.fromLTRB(2.6, 2.6, 13.4, 13.4), stroke)
+      ..drawLine(const Offset(2.6, 6.3), const Offset(13.4, 6.3), stroke)
+      ..drawLine(const Offset(6.3, 2.6), const Offset(6.3, 13.4), stroke);
+  }
+
+  /// An even grid with no frame. [table] is a frame with a heading; this is the
+  /// ruling itself, which is what the View toggle turns off.
+  static void gridlines(Canvas canvas, Paint stroke) {
+    for (final at in const <double>[2.6, 6.4, 9.9, 13.4]) {
+      canvas
+        ..drawLine(Offset(2.6, at), Offset(13.4, at), stroke)
+        ..drawLine(Offset(at, 2.6), Offset(at, 13.4), stroke);
+    }
+  }
+
+  // Charts, one per kind. Eight glyphs rather than one generic chart mark,
+  // because the place they are needed is a gallery where all eight are offered
+  // at once and the picture is the only thing telling them apart.
+  //
+  // The four that plot against axes share [_axes]; the two round ones and the
+  // radar have no axes to draw, which is itself most of the distinction.
+
+  /// The L an axis-plotted chart hangs on.
+  static void _axes(Canvas canvas, Paint stroke) {
+    canvas.drawPath(
+      Path()
+        ..moveTo(2.8, 2.4)
+        ..lineTo(2.8, 13.2)
+        ..lineTo(13.6, 13.2),
+      stroke,
+    );
+  }
+
+  /// Vertical bars.
+  static void chartColumn(Canvas canvas, Paint stroke) {
+    _axes(canvas, stroke);
+    const bars = <(double, double)>[(4.4, 9.4), (7.6, 5.6), (10.8, 7.6)];
+    for (final (left, top) in bars) {
+      canvas.drawRect(Rect.fromLTRB(left, top, left + 2.4, 13.2), stroke);
+    }
+  }
+
+  /// Horizontal bars: [chartColumn] on its side, as the two chart kinds are.
+  static void chartBar(Canvas canvas, Paint stroke) {
+    _axes(canvas, stroke);
+    // Every bar starts at the axis and only its length differs, which is the
+    // one thing a bar chart is. Drawn from 2.8 they sat *on* the axis stroke
+    // and the left edges disappeared into it.
+    const bars = <(double, double)>[(3.4, 7.2), (7, 10.4), (10.6, 8.2)];
+    for (final (top, right) in bars) {
+      canvas.drawRect(Rect.fromLTRB(2.8, top, right, top + 2.4), stroke);
+    }
+  }
+
+  /// A polyline over axes, with no markers on it -- markers at this size are
+  /// three dots that close up into the line.
+  static void chartLine(Canvas canvas, Paint stroke) {
+    _axes(canvas, stroke);
+    canvas.drawPath(
+      Path()
+        ..moveTo(4.4, 10.4)
+        ..lineTo(7, 6.2)
+        ..lineTo(9.6, 8.8)
+        ..lineTo(13, 3.6),
+      stroke,
+    );
+  }
+
+  /// The same polyline, filled down to the axis.
+  static void chartArea(Canvas canvas, Paint stroke) {
+    _axes(canvas, stroke);
+    canvas.drawPath(
+      Path()
+        ..moveTo(2.8, 11.2)
+        ..lineTo(6, 6.6)
+        ..lineTo(9, 9.2)
+        ..lineTo(13.4, 4)
+        ..lineTo(13.4, 13.2)
+        ..lineTo(2.8, 13.2)
+        ..close(),
+      stroke,
+    );
+  }
+
+  /// Points with no line through them.
+  static void chartScatter(Canvas canvas, Paint stroke) {
+    _axes(canvas, stroke);
+    final fill = Paint()
+      ..color = stroke.color
+      ..style = PaintingStyle.fill;
+    const points = <Offset>[
+      Offset(5.2, 10.4),
+      Offset(6.8, 7),
+      Offset(8.8, 9.4),
+      Offset(10.6, 5.2),
+      Offset(12.6, 7.8),
+    ];
+    for (final point in points) {
+      canvas.drawCircle(point, 1.1, fill);
+    }
+  }
+
+  /// A disc with one slice cut out of it.
+  static void chartPie(Canvas canvas, Paint stroke) {
+    canvas
+      ..drawCircle(const Offset(8, 8), 5.4, stroke)
+      ..drawLine(const Offset(8, 8), const Offset(8, 2.6), stroke)
+      ..drawLine(const Offset(8, 8), const Offset(12.4, 11.1), stroke);
+  }
+
+  /// A ring with the same cut, which is the whole difference from [chartPie].
+  static void chartDoughnut(Canvas canvas, Paint stroke) {
+    canvas
+      ..drawCircle(const Offset(8, 8), 5.4, stroke)
+      ..drawCircle(const Offset(8, 8), 2.4, stroke)
+      ..drawLine(const Offset(8, 2.6), const Offset(8, 5.6), stroke);
+  }
+
+  /// A pentagon web with a series plotted inside it.
+  static void chartRadar(Canvas canvas, Paint stroke) {
+    const centre = Offset(8, 8.2);
+    Offset at(int corner, double radius) {
+      final angle = -math.pi / 2 + corner * 2 * math.pi / 5;
+      return centre + Offset(math.cos(angle), math.sin(angle)) * radius;
+    }
+
+    final web = Path()..moveTo(at(0, 5.6).dx, at(0, 5.6).dy);
+    for (var corner = 1; corner < 5; corner++) {
+      web.lineTo(at(corner, 5.6).dx, at(corner, 5.6).dy);
+    }
+    canvas.drawPath(web..close(), stroke);
+
+    // Spokes rather than a plotted series.
+    //
+    // A series inside the web is what a radar chart actually shows, and it
+    // cannot be drawn here: an irregular pentagon of radius one to three units
+    // is three or four pixels across at a toolbar's size, and a 1.5-unit stroke
+    // closes it into a knot. Tried at three different sizes, and it read as a
+    // blot every time. The spokes are the half of the picture that survives,
+    // and a spoked pentagon is what the shape is called after.
+    for (var corner = 0; corner < 5; corner++) {
+      canvas.drawLine(centre, at(corner, 5.6), stroke);
+    }
+  }
 }
 
 /// Renders a [SlateIconDraw] at a given size and colour.
