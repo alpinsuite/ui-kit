@@ -2098,6 +2098,21 @@ abstract final class SlateIcons {
     }
   }
 
+  /// A table whose first row is filled: the row that repeats at the top of
+  /// every page the table runs onto.
+  ///
+  /// The fill is the whole glyph. Drawn as an outline it is [table] again, and
+  /// what makes a header row a header row is that it is the one printed twice.
+  static void tableHeaderRow(Canvas canvas, Paint stroke) {
+    canvas.drawRect(
+      const Rect.fromLTRB(2.5, 3, 13.5, 6.3),
+      Paint()
+        ..color = stroke.color
+        ..style = PaintingStyle.fill,
+    );
+    table(canvas, stroke);
+  }
+
   /// A sheet split into four panes, with the held corner filled.
   ///
   /// The split lines alone are not enough: a frame with a cross in it is a

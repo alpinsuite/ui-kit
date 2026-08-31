@@ -39,12 +39,24 @@ and the package uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   and `chartRadar`'s plotted series is three pixels across at a toolbar's size
   and closes into a blot. None of that is visible in the source.
 
+- **`tableHeaderRow`**, for a word processor: a table whose first row is
+  filled, which is `w:tblHeader` — the row Word repeats at the top of every
+  page a table runs onto. It is the one glyph a table toolbar needs that a
+  spreadsheet has no idea of, and it is the fill that carries it: drawn as an
+  outline it is `table` again.
+
 - The gallery and the test map now list **the same glyphs**. Six that landed
   with the capture-and-annotation set — `upload` `envelope` `person` `reply`
   `send` `flag` — had never been added to `example/lib/main.dart`, so the one
   place a person can look at the kit was quietly missing them.
 
 ### Fixed
+
+- **A `SlateCheckbox` with a sentence for a label painted an overflow stripe.**
+  Its row is `min`-sized so it fits its label, which is right until the label
+  is longer than the column it sits in — a settings checkbox in a dialog. The
+  label is `Flexible` and ellipsizes now. A stripe is not a design decision
+  anyone made; it is what happens when nobody decided.
 
 - **Every control in the kit was invisible to `Tab`.** They were bare
   `GestureDetector`s, so a window built out of them had no keyboard path

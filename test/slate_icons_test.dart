@@ -138,6 +138,7 @@ const Map<String, SlateIconDraw> _glyphs = <String, SlateIconDraw>{
   'deleteColumn': SlateIcons.deleteColumn,
   'freezePanes': SlateIcons.freezePanes,
   'gridlines': SlateIcons.gridlines,
+  'tableHeaderRow': SlateIcons.tableHeaderRow,
   'chartColumn': SlateIcons.chartColumn,
   'chartBar': SlateIcons.chartBar,
   'chartLine': SlateIcons.chartLine,
