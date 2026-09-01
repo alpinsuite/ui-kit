@@ -52,6 +52,29 @@ and the package uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Fixed
 
+- **Every control the keyboard change touched had stopped filling the width its
+  parent gave it, and the gap beside it swallowed clicks.** `SlateFocusable`
+  wraps its child in a `Stack` to draw the focus ring as an overlay, and a
+  `Stack` loosens the constraints it hands its children — so a control that a
+  parent had stretched (a `SlateSelect` in a dialog row, a `SlateButton` in an
+  `Expanded`) shrank back to its natural size while the box around it still
+  took the full width. A click at the centre of where the control had always
+  been landed on nothing: dropdowns stopped opening, buttons stopped pressing.
+  `StackFit.passthrough` hands the parent's constraints down unchanged.
+
+  **Nothing in this kit's own tests could have caught it**, and that is the
+  part worth keeping: every control here is pumped on its own, where its
+  natural size *is* the width it is given, so the two are the same number and
+  the bug is invisible. It surfaced in an application — a conditional-formatting
+  dialog whose colour dropdown would not open. The new test stretches a control
+  with `Expanded` and then presses it at its centre, which is the half a size
+  assertion alone would still miss.
+
+- `SlateSelect` hands its trigger's focus node to `MenuAnchor.childFocusNode`.
+  A menu closes when focus lands outside it, and making the trigger focusable
+  put a focus node exactly there — so opening the list from the keyboard would
+  shut it again on the way in.
+
 - **A `SlateCheckbox` with a sentence for a label painted an overflow stripe.**
   Its row is `min`-sized so it fits its label, which is right until the label
   is longer than the column it sits in — a settings checkbox in a dialog. The

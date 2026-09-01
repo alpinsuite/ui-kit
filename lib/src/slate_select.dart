@@ -37,7 +37,27 @@ class SlateSelect<T> extends StatefulWidget {
 
 class _SlateSelectState<T> extends State<SlateSelect<T>> {
   final MenuController _controller = MenuController();
+
+  /// The trigger's own focus node, handed to both the focusable wrapper and the
+  /// anchor.
+  ///
+  /// A `MenuAnchor` closes its menu when focus lands outside it, and making the
+  /// trigger focusable put a focus node exactly there — so opening the list
+  /// from the keyboard would shut it again on the way in. `childFocusNode` is
+  /// the framework's answer: it tells the anchor this node is part of the menu,
+  /// so focus arriving here is not focus leaving.
+  ///
+  /// This is not what broke opening by *mouse*; that was the `Stack` in
+  /// [SlateFocusable] loosening this control's constraints, and the note there
+  /// says so.
+  final FocusNode _trigger = FocusNode(debugLabel: 'SlateSelect');
   bool _hover = false;
+
+  @override
+  void dispose() {
+    _trigger.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -50,6 +70,7 @@ class _SlateSelectState<T> extends State<SlateSelect<T>> {
       parent: null,
       child: MenuAnchor(
         controller: _controller,
+        childFocusNode: _trigger,
         style: slateMenuStyle(theme),
         alignmentOffset: const Offset(0, 4),
         menuChildren: <Widget>[
@@ -67,6 +88,7 @@ class _SlateSelectState<T> extends State<SlateSelect<T>> {
             onEnter: (_) => setState(() => _hover = true),
             onExit: (_) => setState(() => _hover = false),
             child: SlateFocusable(
+              focusNode: _trigger,
               onPressed: () =>
                   controller.isOpen ? controller.close() : controller.open(),
               borderRadius: BorderRadius.circular(theme.metrics.radius),

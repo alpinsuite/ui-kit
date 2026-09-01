@@ -73,6 +73,16 @@ class _SlateFocusableState extends State<SlateFocusable> {
       // `SlateMetrics` says — permanently, not only while focused. Drawn
       // inside the child's own bounds, the ring costs no space at all.
       child: Stack(
+        // **`passthrough`, and the default cost every wrapped control its
+        // width.** A `Stack` loosens the constraints it hands its non-positioned
+        // children, so a control whose parent had stretched it — a select in a
+        // dialog row, a button in an `Expanded` — stopped filling that width and
+        // shrank to its natural size, while the `Stack` around it still took the
+        // whole box. The gap was inert: a click at the centre of where the
+        // control had always been landed on nothing, so no dropdown opened and
+        // no button pressed. `passthrough` hands the parent's own constraints
+        // down unchanged, which is what wrapping something is supposed to mean.
+        fit: StackFit.passthrough,
         children: <Widget>[
           widget.child,
           if (_focused)

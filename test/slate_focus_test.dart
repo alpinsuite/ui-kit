@@ -81,6 +81,59 @@ void main() {
       expect(tester.getSize(find.byType(SlateButton)).height, expected);
     });
 
+    testWidgets('a stretched control still fills the width it was given', (
+      tester,
+    ) async {
+      // **The regression this exists for.** A `Stack` loosens the constraints
+      // it hands its children, so wrapping every control in one made each of
+      // them shrink to its natural size inside whatever width its parent had
+      // stretched it to. Nothing looked broken in the kit's own tests, where a
+      // control is pumped on its own and its natural size *is* its width — it
+      // only showed in an application, as a select in a dialog row that had
+      // stopped opening, because the click landed in the inert gap beside the
+      // control rather than on it.
+      await tester.pumpWidget(
+        wrap(
+          SizedBox(
+            width: 400,
+            child: Row(
+              children: <Widget>[
+                Expanded(
+                  child: SlateButton(label: 'Save', onPressed: () {}),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+
+      expect(tester.getSize(find.byType(SlateButton)).width, 400);
+
+      // And the press still lands at the centre of that width, which is the
+      // half of it a size assertion alone would miss.
+      var pressed = false;
+      await tester.pumpWidget(
+        wrap(
+          SizedBox(
+            width: 400,
+            child: Row(
+              children: <Widget>[
+                Expanded(
+                  child: SlateButton(
+                    label: 'Save',
+                    onPressed: () => pressed = true,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+      await tester.tap(find.byType(SlateButton));
+      await tester.pump();
+      expect(pressed, isTrue);
+    });
+
     testWidgets('an icon button is reachable', (tester) async {
       var taps = 0;
       await tester.pumpWidget(
