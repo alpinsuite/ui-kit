@@ -109,4 +109,27 @@ void main() {
     expect(colourOf('Loud'), theme.palette.accent);
     expect(colourOf('Quiet'), theme.palette.inkDim);
   });
+
+  testWidgets('read-outs give way before controls do', (tester) async {
+    // A status bar is where everything ends up, so one item too many must not
+    // paint the overflow stripe. The read-outs are what give way: the controls
+    // are the half you still have to be able to press.
+    await tester.pumpWidget(
+      wrap(
+        SizedBox(
+          width: 200,
+          child: SlateStatusBar(
+            leading: <Widget>[
+              for (var i = 0; i < 8; i++)
+                SlateStatusItem(label: 'a read-out $i'),
+            ],
+            trailing: <Widget>[SlateButton(label: 'zoom', onPressed: () {})],
+          ),
+        ),
+      ),
+    );
+
+    expect(tester.takeException(), isNull, reason: 'it overflowed');
+    expect(find.text('zoom'), findsOneWidget);
+  });
 }

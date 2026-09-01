@@ -86,6 +86,20 @@ and the package uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Fixed
 
+- **`SlateStatusBar` painted the overflow stripe as soon as an application put
+  one item too many in it**, which an application will: a status bar is where
+  everything ends up. It was a plain `Row` of leading, a `Spacer` and trailing,
+  with nothing to give.
+
+  The two halves are not worth the same, so they do not behave the same. The
+  **controls keep their size** — they are the half you still have to be able to
+  press — and the **read-outs give way**, scrolling sideways in whatever room
+  is left. A bar with room to spare is unchanged: the leading group is
+  `Flexible` and loose, so it lays out at its natural size and nothing moves.
+
+  Found from express, whose status bar gained a language and a zoom slider on
+  the same afternoon and overflowed by 66 pixels in a narrow window.
+
 - **`SlateColorButton` lit both its halves together**, which makes a split
   button look like one wide button and leaves the second target to be found by
   accident. Only the half under the pointer lights now, matching

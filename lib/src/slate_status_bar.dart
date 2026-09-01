@@ -94,6 +94,17 @@ class _SlateStatusItemState extends State<SlateStatusItem> {
 }
 
 /// The bar across the bottom of the window.
+///
+/// [leading] is read-outs — a page number, a word count, a language — and
+/// [trailing] is controls. They are treated differently when the window is too
+/// narrow for both, because they are worth different amounts: **the controls
+/// keep their size and the read-outs give way**, scrolling sideways inside
+/// whatever room is left.
+///
+/// A `Row` of both was what stood here, and it painted the overflow stripe the
+/// moment an application added one item too many — which an application will,
+/// because a status bar is where everything ends up. A stripe is not a design
+/// decision anybody made.
 class SlateStatusBar extends StatelessWidget {
   const SlateStatusBar({
     this.leading = const <Widget>[],
@@ -115,7 +126,22 @@ class SlateStatusBar extends StatelessWidget {
         color: palette.panel,
         border: Border(top: BorderSide(color: palette.separator)),
       ),
-      child: Row(children: <Widget>[...leading, const Spacer(), ...trailing]),
+      child: Row(
+        children: <Widget>[
+          Flexible(
+            // Loose, so a bar with room to spare lays its read-outs out at
+            // their natural size and nothing moves.
+            child: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              // A status bar is not a place anybody expects to drag, so the
+              // strip scrolls only when a pointer wheel or a trackpad asks.
+              child: Row(mainAxisSize: MainAxisSize.min, children: leading),
+            ),
+          ),
+          const Spacer(),
+          ...trailing,
+        ],
+      ),
     );
   }
 }
