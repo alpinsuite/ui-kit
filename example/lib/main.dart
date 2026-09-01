@@ -197,6 +197,43 @@ class _GalleryState extends State<_Gallery> {
                         noColorLabel: 'None',
                         onNoColor: () => setState(() => _highlight = null),
                       ),
+                      SlateSplitButton(
+                        icon: SlateIcons.paste,
+                        tooltip: 'Paste',
+                        menuTooltip: 'Paste Special',
+                        onPressed: () => _ran('Paste'),
+                        menuChildren: <Widget>[
+                          for (final String what in <String>[
+                            'Values',
+                            'Formulas',
+                            'Formats',
+                          ])
+                            SlateButton(
+                              label: 'Paste $what',
+                              onPressed: () => _ran('Paste $what'),
+                            ),
+                        ],
+                      ),
+                      // The action half disabled and the list still open-able,
+                      // which is the arrangement a paste button wants when the
+                      // clipboard is empty.
+                      SlateSplitButton(
+                        icon: SlateIcons.chartColumn,
+                        tooltip: 'Insert chart',
+                        onPressed: null,
+                        menuChildren: <Widget>[
+                          SlateButton(
+                            label: 'Column',
+                            icon: SlateIcons.chartColumn,
+                            onPressed: () => _ran('Column chart'),
+                          ),
+                          SlateButton(
+                            label: 'Pie',
+                            icon: SlateIcons.chartPie,
+                            onPressed: () => _ran('Pie chart'),
+                          ),
+                        ],
+                      ),
                     ],
                   ),
                   SizedBox(height: theme.metrics.pad + 8),

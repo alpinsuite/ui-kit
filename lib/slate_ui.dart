@@ -35,6 +35,7 @@ export 'src/slate_panel.dart';
 export 'src/slate_popover.dart';
 export 'src/slate_scrollbar.dart';
 export 'src/slate_select.dart';
+export 'src/slate_split_button.dart';
 export 'src/slate_split_view.dart';
 export 'src/slate_status_bar.dart';
 export 'src/slate_tabs.dart';

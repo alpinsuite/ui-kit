@@ -274,7 +274,16 @@ class SlateColorButton extends StatefulWidget {
 
 class _SlateColorButtonState extends State<SlateColorButton> {
   final MenuController _controller = MenuController();
-  bool _hovered = false;
+
+  /// Which half the pointer is over.
+  ///
+  /// **One flag for both halves lit them together**, which makes a split button
+  /// look like one wide button and leaves the second target to be found by
+  /// accident. [SlateSplitButton] is the same shape and lights only the half
+  /// under the pointer; two split buttons side by side on a toolbar behaving
+  /// differently reads as a bug in one of them.
+  bool _onSwatch = false;
+  bool _onChevron = false;
 
   @override
   Widget build(BuildContext context) {
@@ -308,8 +317,6 @@ class _SlateColorButtonState extends State<SlateColorButton> {
         ],
         builder: (context, controller, _) => MouseRegion(
           cursor: SystemMouseCursors.click,
-          onEnter: (_) => setState(() => _hovered = true),
-          onExit: (_) => setState(() => _hovered = false),
           child: Tooltip(
             message: widget.tooltip,
             child: SizedBox(
@@ -317,37 +324,45 @@ class _SlateColorButtonState extends State<SlateColorButton> {
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: <Widget>[
-                  GestureDetector(
-                    onTap: widget.onPressed,
-                    child: Container(
-                      color: _hovered
-                          ? theme.palette.chrome
-                          : const Color(0x00000000),
-                      padding: const EdgeInsets.symmetric(horizontal: 3),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: <Widget>[
-                          SlateIcon(widget.icon, size: metrics.iconSize),
-                          const SizedBox(height: 1),
-                          Container(
-                            width: metrics.iconSize,
-                            height: 3,
-                            color: widget.color ?? theme.palette.border,
-                          ),
-                        ],
+                  MouseRegion(
+                    onEnter: (_) => setState(() => _onSwatch = true),
+                    onExit: (_) => setState(() => _onSwatch = false),
+                    child: GestureDetector(
+                      onTap: widget.onPressed,
+                      child: Container(
+                        color: _onSwatch
+                            ? theme.palette.chrome
+                            : const Color(0x00000000),
+                        padding: const EdgeInsets.symmetric(horizontal: 3),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: <Widget>[
+                            SlateIcon(widget.icon, size: metrics.iconSize),
+                            const SizedBox(height: 1),
+                            Container(
+                              width: metrics.iconSize,
+                              height: 3,
+                              color: widget.color ?? theme.palette.border,
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ),
-                  GestureDetector(
-                    onTap: () => controller.isOpen
-                        ? controller.close()
-                        : controller.open(),
-                    child: Container(
-                      color: _hovered
-                          ? theme.palette.chrome
-                          : const Color(0x00000000),
-                      padding: const EdgeInsets.symmetric(horizontal: 1),
-                      child: SlateIcon(SlateIcons.chevronDown, size: 10),
+                  MouseRegion(
+                    onEnter: (_) => setState(() => _onChevron = true),
+                    onExit: (_) => setState(() => _onChevron = false),
+                    child: GestureDetector(
+                      onTap: () => controller.isOpen
+                          ? controller.close()
+                          : controller.open(),
+                      child: Container(
+                        color: _onChevron || controller.isOpen
+                            ? theme.palette.chrome
+                            : const Color(0x00000000),
+                        padding: const EdgeInsets.symmetric(horizontal: 1),
+                        child: SlateIcon(SlateIcons.chevronDown, size: 10),
+                      ),
                     ),
                   ),
                 ],

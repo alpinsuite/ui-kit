@@ -9,6 +9,26 @@ and the package uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
+- **`SlateSplitButton`** — a default action and a list of alternatives behind a
+  chevron. Two targets, not one: pressing the icon does the thing the reader
+  almost always wants, and the chevron offers the rest. Paste and Paste Special
+  are one gesture and one afterthought, not two equal choices, and a toolbar
+  that spends two whole buttons on them says otherwise.
+
+  The halves disable separately, which is what the case actually wants: a paste
+  button with an empty clipboard has nothing to paste and still has
+  alternatives worth reading. **An empty list draws no chevron at all**, rather
+  than a disabled one — the one place this kit's usual rule (disabled rather
+  than absent, because a command that vanishes teaches the reader it does not
+  exist) does not apply, because a chevron is not a command, it is a claim
+  about what is behind it. Drawn disabled it is either `inkDim` and looks live,
+  or `border` and all but invisible against `chrome`, which reads as a
+  rendering fault.
+
+  Both halves are tab stops, and the chevron's focus node goes to
+  `MenuAnchor.childFocusNode` — without it, opening the list from the keyboard
+  shuts it again on the way in.
+
 - **35 spreadsheet glyphs**, which is most of a spreadsheet's toolbar:
   `paste` `cut`; `borders` `bordersOutline` `bordersNone`; `fillColor`;
   `cellAlignTop` `cellAlignMiddle` `cellAlignBottom`; `wrapText`;
@@ -51,6 +71,12 @@ and the package uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   place a person can look at the kit was quietly missing them.
 
 ### Fixed
+
+- **`SlateColorButton` lit both its halves together**, which makes a split
+  button look like one wide button and leaves the second target to be found by
+  accident. Only the half under the pointer lights now, matching
+  `SlateSplitButton` — the two sit side by side on a real toolbar, and two
+  split buttons behaving differently reads as a bug in one of them.
 
 - **Every control the keyboard change touched had stopped filling the width its
   parent gave it, and the gap beside it swallowed clicks.** `SlateFocusable`
