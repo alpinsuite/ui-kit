@@ -9,6 +9,20 @@ and the package uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
+- **`SlateCheckbox` and `SlateField` can be disabled**, which is the convention
+  every other control here already followed — `onChanged: null` on the box,
+  `enabled: false` on the field. A tick box that cannot be ticked is a real
+  state (an option that only applies to some documents, a setting another
+  setting turns off), and the alternative to showing it disabled is hiding it,
+  which teaches the reader it does not exist and leaves them hunting for it on
+  the next document where it does.
+
+  Both keep showing their value. A disabled ticked box still reads as ticked
+  and a disabled field still shows its text: that is the state being reported,
+  and blanking it to make a point about being disabled throws away the answer
+  the reader will get back when it is enabled again. A disabled box is not a
+  tab stop, matching `SlateFocusable`.
+
 - **`SlateSplitButton`** — a default action and a list of alternatives behind a
   chevron. Two targets, not one: pressing the icon does the thing the reader
   almost always wants, and the chevron offers the rest. Paste and Paste Special

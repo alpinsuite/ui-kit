@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:slate_ui/slate_ui.dart';
 
@@ -429,6 +430,67 @@ void main() {
 
       expect(tester.getSize(find.byType(SlateSeparator).at(0)).height, 1);
       expect(tester.getSize(find.byType(SlateSeparator).at(1)).width, 1);
+    });
+  });
+
+  group('disabled', () {
+    testWidgets('a tick box with no handler cannot be ticked', (tester) async {
+      await tester.pumpWidget(
+        wrap(
+          const SlateCheckbox(
+            value: true,
+            label: 'Value axis',
+            onChanged: null,
+          ),
+        ),
+      );
+
+      // Nothing to assert about a callback that does not exist; what matters
+      // is that pressing it throws nothing and changes nothing.
+      await tester.tap(find.byType(SlateCheckbox));
+      await tester.pump();
+      expect(tester.takeException(), isNull);
+
+      // **And it still reads as ticked.** The tick is the state it reports;
+      // only the ability to change it has gone, and blanking it would throw
+      // away the answer to make a point about being disabled.
+      expect(find.byType(SlateIcon), findsOneWidget);
+    });
+
+    testWidgets('a disabled tick box is not a tab stop', (tester) async {
+      var taps = 0;
+      await tester.pumpWidget(
+        wrap(
+          Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              const SlateCheckbox(value: false, label: 'Off', onChanged: null),
+              SlateButton(label: 'After', onPressed: () => taps++),
+            ],
+          ),
+        ),
+      );
+
+      // One Tab reaches the button past it, not the box.
+      await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+      await tester.pumpAndSettle();
+      await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+      await tester.pumpAndSettle();
+      expect(taps, 1);
+    });
+
+    testWidgets('a disabled field keeps its text and refuses the caret', (
+      tester,
+    ) async {
+      final controller = TextEditingController(text: 'Revenue by region');
+      addTearDown(controller.dispose);
+      await tester.pumpWidget(
+        wrap(SlateField(controller: controller, enabled: false)),
+      );
+
+      // The value survives: it is what comes back when it is re-enabled.
+      expect(find.text('Revenue by region'), findsOneWidget);
+      expect(tester.widget<TextField>(find.byType(TextField)).enabled, isFalse);
     });
   });
 }

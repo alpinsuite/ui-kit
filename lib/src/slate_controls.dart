@@ -229,7 +229,15 @@ class SlateCheckbox extends StatefulWidget {
 
   final bool value;
   final String label;
-  final ValueChanged<bool> onChanged;
+
+  /// Null disables it, as everywhere in this kit.
+  ///
+  /// A tick box that cannot be ticked is a real state — a chart option that
+  /// only applies to charts with axes, a setting another setting turns off —
+  /// and the alternative to showing it disabled is hiding it, which teaches
+  /// the reader it does not exist and leaves them hunting for it on the next
+  /// document where it does.
+  final ValueChanged<bool>? onChanged;
 
   @override
   State<SlateCheckbox> createState() => _SlateCheckboxState();
@@ -242,18 +250,20 @@ class _SlateCheckboxState extends State<SlateCheckbox> {
   Widget build(BuildContext context) {
     final theme = context.slate;
     final palette = theme.palette;
+    final enabled = widget.onChanged != null;
+    void toggle() => widget.onChanged?.call(!widget.value);
     return MouseRegion(
-      cursor: SystemMouseCursors.click,
-      onEnter: (_) => setState(() => _hover = true),
+      cursor: enabled ? SystemMouseCursors.click : SystemMouseCursors.basic,
+      onEnter: (_) => setState(() => _hover = enabled),
       onExit: (_) => setState(() => _hover = false),
       child: SlateFocusable(
-        onPressed: () => widget.onChanged(!widget.value),
+        onPressed: enabled ? toggle : null,
         borderRadius: BorderRadius.circular(theme.metrics.radius),
         child: GestureDetector(
           behavior: HitTestBehavior.opaque,
           // The label is part of the target: a 13px box is a mean thing to ask
           // anyone to hit.
-          onTap: () => widget.onChanged(!widget.value),
+          onTap: enabled ? toggle : null,
           child: Semantics(
             checked: widget.value,
             label: widget.label,
@@ -265,9 +275,13 @@ class _SlateCheckboxState extends State<SlateCheckbox> {
                   height: 13,
                   alignment: Alignment.center,
                   decoration: BoxDecoration(
-                    color: widget.value ? palette.accent : palette.field,
+                    color: widget.value && enabled
+                        ? palette.accent
+                        : palette.field,
                     border: Border.all(
-                      color: widget.value
+                      color: !enabled
+                          ? palette.fieldBorder
+                          : widget.value
                           ? palette.accent
                           : _hover
                           ? palette.inkDim
@@ -281,7 +295,10 @@ class _SlateCheckboxState extends State<SlateCheckbox> {
                       ? SlateIcon(
                           SlateIcons.check,
                           size: 10,
-                          color: palette.onAccent,
+                          // A ticked box that is disabled still reads as
+                          // ticked: the tick is the state it is reporting, and
+                          // only the ability to change it has gone.
+                          color: enabled ? palette.onAccent : palette.inkDim,
                           weight: 2,
                         )
                       : null,
@@ -297,6 +314,7 @@ class _SlateCheckboxState extends State<SlateCheckbox> {
                     overflow: TextOverflow.ellipsis,
                     style: theme.textStyle.copyWith(
                       fontSize: theme.metrics.smallFontSize,
+                      color: enabled ? null : palette.inkDim,
                     ),
                   ),
                 ),
@@ -484,6 +502,7 @@ class SlateField extends StatelessWidget {
     this.autofocus = false,
     this.hint,
     this.obscureText = false,
+    this.enabled = true,
     super.key,
   });
 
@@ -503,6 +522,15 @@ class SlateField extends StatelessWidget {
   /// that does neither.
   final bool obscureText;
 
+  /// False greys it and refuses the caret, and **keeps showing what is in it**.
+  ///
+  /// A disabled field still reports a value: a chart's title with the title
+  /// switched off is the title it will have again when it is switched back on,
+  /// and blanking it would throw that away to make a point about being
+  /// disabled. This is the field's half of the convention `onPressed: null`
+  /// carries everywhere else in this kit.
+  final bool enabled;
+
   @override
   Widget build(BuildContext context) {
     final theme = context.slate;
@@ -512,6 +540,7 @@ class SlateField extends StatelessWidget {
       height: theme.metrics.fieldHeight,
       child: TextField(
         controller: controller,
+        enabled: enabled,
         focusNode: focusNode,
         autofocus: autofocus,
         onChanged: onChanged,
@@ -523,7 +552,10 @@ class SlateField extends StatelessWidget {
         autocorrect: !obscureText,
         cursorWidth: 1,
         cursorColor: palette.accent,
-        style: theme.textStyle.copyWith(fontSize: theme.metrics.smallFontSize),
+        style: theme.textStyle.copyWith(
+          fontSize: theme.metrics.smallFontSize,
+          color: enabled ? null : palette.inkDim,
+        ),
         decoration: InputDecoration(
           isDense: true,
           filled: true,
@@ -542,6 +574,13 @@ class SlateField extends StatelessWidget {
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(theme.metrics.radius),
             borderSide: BorderSide(color: palette.accent),
+          ),
+          // Material's own disabled border is a different weight and colour
+          // from this kit's; left alone it is the one thing on a dialog that
+          // does not match everything around it.
+          disabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(theme.metrics.radius),
+            borderSide: BorderSide(color: palette.fieldBorder),
           ),
         ),
       ),
