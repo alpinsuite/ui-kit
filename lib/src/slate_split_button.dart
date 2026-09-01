@@ -135,11 +135,20 @@ class _SlateSplitButtonState extends State<SlateSplitButton> {
             Row(
               mainAxisSize: MainAxisSize.min,
               children: <Widget>[
+                // **The two halves hug, and the pair keeps its distance from
+                // whatever is next.** With symmetric padding the chevron sat as
+                // far from its own icon as from the following button, so on a
+                // dense toolbar it read as though it might belong to either --
+                // seen in a render of cells' bar, where a paste chevron looked
+                // like it could be the Format Painter's. Asymmetric padding
+                // makes the gap inside the button roughly a fifth of the gap
+                // between buttons, which is what says "these two are one
+                // control".
                 half(
                   message: widget.tooltip,
                   lit: _onAction || widget.selected,
                   onPressed: widget.onPressed,
-                  padding: const EdgeInsets.symmetric(horizontal: 3),
+                  padding: const EdgeInsets.only(left: 3, right: 1),
                   onHover: (bool over) => setState(() => _onAction = over),
                   child: SlateIcon(
                     widget.icon,
@@ -169,7 +178,7 @@ class _SlateSplitButtonState extends State<SlateSplitButton> {
                     onPressed: () => controller.isOpen
                         ? controller.close()
                         : controller.open(),
-                    padding: const EdgeInsets.symmetric(horizontal: 1),
+                    padding: const EdgeInsets.only(left: 0, right: 4),
                     onHover: (bool over) => setState(() => _onChevron = over),
                     child: SlateIcon(
                       SlateIcons.chevronDown,
