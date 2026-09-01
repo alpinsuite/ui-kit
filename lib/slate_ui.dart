@@ -33,6 +33,7 @@ export 'src/slate_metrics.dart';
 export 'src/slate_palette.dart';
 export 'src/slate_panel.dart';
 export 'src/slate_popover.dart';
+export 'src/slate_radio.dart';
 export 'src/slate_scrollbar.dart';
 export 'src/slate_select.dart';
 export 'src/slate_split_button.dart';

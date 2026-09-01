@@ -9,6 +9,24 @@ and the package uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
+- **`SlateRadioGroup`** — mutually exclusive choices with none of them hidden.
+  A `SlateSelect` shows one option and puts the rest behind a click, which is
+  right for a long list where the current value is the interesting part, and
+  wrong for a small set somebody is being asked to *choose between*: comparing
+  four options means reading four options, and a dropdown makes that a click
+  and a memory test. Excel's Insert Cells is the shape it exists for.
+
+  A group rather than a widget per button, so exclusivity is structural — radio
+  buttons each carrying their own `selected` flag are a set of booleans someone
+  has to keep consistent, and the bug is always two of them true at once.
+  Individual options can be disabled (`enabledOf`) rather than removed, because
+  a choice that vanishes changes the shape of a dialog between two openings of
+  it. A value that is not in the list selects nothing rather than throwing,
+  which is what a dialog re-opened on a changed document needs.
+
+  Drawn as a ring with a dot, not a filled disc: a radio button filled solid
+  like a tick box is one a reader has to look twice at to tell from one.
+
 - **`SlateCheckbox` and `SlateField` can be disabled**, which is the convention
   every other control here already followed — `onChanged: null` on the box,
   `enabled: false` on the field. A tick box that cannot be ticked is a real

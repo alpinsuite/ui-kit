@@ -59,6 +59,7 @@ class _GalleryState extends State<_Gallery> {
   String _lastCommand = 'nothing yet';
   Color? _fontColor = SlateSwatches.hues.first;
   Color? _highlight;
+  String _shift = 'Shift cells down';
   List<Color> _recentColors = const <Color>[];
   double _scrollX = 0;
   double _scrollY = 0;
@@ -235,6 +236,23 @@ class _GalleryState extends State<_Gallery> {
                         ],
                       ),
                     ],
+                  ),
+                  SizedBox(height: theme.metrics.pad + 8),
+
+                  _section(theme, 'Radio group'),
+                  SlateRadioGroup<String>(
+                    value: _shift,
+                    values: const <String>[
+                      'Shift cells right',
+                      'Shift cells down',
+                      'Entire row',
+                      'Entire column',
+                    ],
+                    labelOf: (String v) => v,
+                    // One disabled, to show the state: an option that would
+                    // split a merge is the case this exists for.
+                    enabledOf: (String v) => v != 'Shift cells right',
+                    onChanged: (String v) => setState(() => _shift = v),
                   ),
                   SizedBox(height: theme.metrics.pad + 8),
 
