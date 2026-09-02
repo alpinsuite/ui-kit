@@ -155,4 +155,18 @@ that job is green.
 
 ## Licence
 
-MIT. See [LICENSE](LICENSE).
+Apache-2.0. See [LICENSE](LICENSE) and [NOTICE](NOTICE).
+
+Permissive on purpose: this kit exists to be adopted, including in closed
+commercial products, and a widget kit nobody outside the project can use is a
+widget kit nobody uses. Apache rather than MIT for two clauses MIT does not
+have. Section 3 grants an explicit patent licence, where MIT is silent and an
+adopter is left relying on an implied one that barely exists outside US case
+law. Section 6 states that the licence grants no rights in the names or marks,
+which MIT leaves open to argument.
+
+Note for anyone combining this with copyleft code: Apache-2.0 is compatible
+with GPLv3 and not with GPLv2.
+
+Versions up to and including 0.7.0 were published under the MIT License and
+remain available under it.

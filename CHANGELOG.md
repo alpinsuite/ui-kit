@@ -7,6 +7,17 @@ and the package uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Changed
+
+- **Relicensed to Apache-2.0** from MIT. Still permissive: use it, change it,
+  ship it inside a proprietary product. What Apache adds over MIT is an
+  explicit patent grant with defensive termination, and an explicit statement
+  that the licence conveys no rights in the names or marks. Both are what an
+  adopter's counsel checks before building a product on a design system.
+  Versions up to and including 0.7.0 were published under MIT and stay
+  available under it. Apache-2.0 is GPLv3-compatible and GPLv2-incompatible.
+
+
 ### Added
 
 - **`SlateRadioGroup`** — mutually exclusive choices with none of them hidden.
