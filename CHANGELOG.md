@@ -7,6 +7,8 @@ and the package uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.8.0] - 2026-09-17
+
 ### Added
 
 - **`SlateRadioGroup`** — mutually exclusive choices with none of them hidden.
@@ -227,6 +229,17 @@ and the package uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   rail down the left edge spans every band the panes beside it occupy, so `Tab`
   went: first destination, the whole toolbar next to it, second destination.
   The group keeps the rail together, and it sorts first because it is leftmost.
+
+- `showSlatePopover`, an overlay anchored to a control that holds whatever the
+  caller builds, and resolves to the value its builder's `close` was given. The
+  kit had `showSlateContextMenu` for a list of items and nothing general, and a
+  colour grid, a filter panel and a date picker are all a small surface attached
+  to a control — each one written by hand is another place the shadow, the
+  dismissal and the screen-edge behaviour come out slightly different.
+
+  One that would run off the bottom opens above its anchor rather than being
+  squashed against the edge: a panel jammed into the last twenty pixels is
+  unusable. A tap outside or `Escape` dismisses it, with `null`.
 
 - `SlateIcons.upload`, the mirror of `download` — the same tray with the arrow
   reversed. The pair is only legible as a pair: an upload drawn with a different
