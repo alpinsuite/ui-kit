@@ -7,6 +7,30 @@ and the package uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Fixed
+
+- **`danger` could not be read as text.** It was chosen as a fill — the close
+  button's hover — and applications draw every error message in it. In the dark
+  palette it was 3.55:1 to 4.42:1 on the kit's surfaces, under WCAG AA's 4.5 on
+  every one of them and 3.88 on a dialog; in the light palette it was 4.12 on a
+  hovered row and 4.43 on a panel, passing only on white.
+
+  It is now `0xFFED685E` in the dark palette and `0xFFC53328` in the light: at
+  least 4.59:1 and 4.70:1 as text on background, chrome, panel, popover, hover,
+  selected and field, while the close button's white glyph keeps 3.11:1 and
+  5.41:1 on it. `slate_palette_test.dart` measures every text colour on every
+  surface, and the accent as a glyph, so the next palette change is held to
+  both.
+
+  **This is a visual change**: the red is lighter in the dark palette and a
+  shade darker in the light one.
+
+- **An emphasised `SlateStatusItem` drew its label in the accent**, 4.20:1 on
+  the light bar and 3.91 under the pointer. The label is now ink and the icon
+  carries the accent, where a glyph needs 3:1 — the choice the chosen segment of
+  a `SlateSegmented` made. **This is a visual change**: an emphasised label is
+  no longer in the accent colour.
+
 ## [0.8.0] - 2026-09-17
 
 ### Added

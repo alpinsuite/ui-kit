@@ -24,8 +24,13 @@ class SlateStatusItem extends StatefulWidget {
   final VoidCallback? onPressed;
   final String? tooltip;
 
-  /// Draws in the accent colour. For the one number that matters — overdue
-  /// work, unresolved problems.
+  /// Marks the one number that matters — overdue work, unresolved problems — with
+  /// the accent on its icon and full ink on its label.
+  ///
+  /// Not the accent on the label. In the light palette that is 4.20:1 on the
+  /// bar and 3.91 under the pointer, under the 4.5 a label this size needs; an
+  /// icon needs 3:1, so the icon carries the colour and the label stays
+  /// readable — the choice the chosen segment of a `SlateSegmented` made.
   final bool emphasis;
 
   @override
@@ -40,7 +45,8 @@ class _SlateStatusItemState extends State<SlateStatusItem> {
     final theme = context.slate;
     final palette = theme.palette;
     final interactive = widget.onPressed != null;
-    final colour = widget.emphasis ? palette.accent : palette.inkDim;
+    final glyph = widget.emphasis ? palette.accent : palette.inkDim;
+    final ink = widget.emphasis ? palette.ink : palette.inkDim;
 
     Widget content = Container(
       height: theme.metrics.barHeight,
@@ -54,11 +60,11 @@ class _SlateStatusItemState extends State<SlateStatusItem> {
             SlateIcon(
               widget.icon!,
               size: theme.metrics.smallFontSize,
-              color: colour,
+              color: glyph,
             ),
             SizedBox(width: theme.metrics.gap / 2),
           ],
-          Text(widget.label, style: theme.dimTextStyle.copyWith(color: colour)),
+          Text(widget.label, style: theme.dimTextStyle.copyWith(color: ink)),
         ],
       ),
     );

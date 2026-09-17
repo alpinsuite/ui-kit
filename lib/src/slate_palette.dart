@@ -66,7 +66,13 @@ class SlatePalette {
   final Color field;
   final Color fieldBorder;
 
-  /// Destructive actions: the window close button, delete.
+  /// Destructive actions: the window close button, delete — and error text.
+  ///
+  /// Chosen for both jobs at once. As text it reads at 4.5:1 or better on
+  /// every surface above, which is what WCAG AA asks of a message this size;
+  /// as the close button's hover fill it carries a white glyph at 3:1 or
+  /// better, which is what a glyph needs. A red light enough for the first is
+  /// only just dark enough for the second, so a change here has to keep both.
   final Color danger;
 
   final Color shadow;
@@ -91,7 +97,11 @@ class SlatePalette {
     selected: Color(0xFF2E2A22),
     field: Color(0xFF191C21),
     fieldBorder: Color(0xFF333A43),
-    danger: Color(0xFFE04A3F),
+    // 4.59:1 on `selected`, the least of the surfaces, 5.01 on `popover` where
+    // a dialog's error line sits; white on it is 3.11. The previous value,
+    // 0xFFE04A3F, was 3.55 to 4.42 as text — under 4.5 on every surface, and
+    // 3.88 on a dialog — because it was only ever chosen as a fill.
+    danger: Color(0xFFED685E),
     shadow: Color(0x6B000000),
     brightness: Brightness.dark,
   );
@@ -116,7 +126,10 @@ class SlatePalette {
     selected: Color(0xFFFBF0DF),
     field: Color(0xFFFFFFFF),
     fieldBorder: Color(0xFFD3D8DF),
-    danger: Color(0xFFD4392E),
+    // 4.70:1 on `hover`, the least of the surfaces, 5.05 on `panel`; white on
+    // it is 5.41. The previous value, 0xFFD4392E, measured 4.12 on hover and
+    // 4.43 on panel, and passed only on white.
+    danger: Color(0xFFC53328),
     shadow: Color(0x21161C24),
     brightness: Brightness.light,
   );

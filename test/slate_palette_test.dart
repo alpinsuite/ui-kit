@@ -46,6 +46,75 @@ void main() {
       expect(SlatePalette.dark.border, isNot(SlatePalette.light.border));
     });
 
+    group('reads, measured the way WCAG measures', () {
+      double contrast(Color a, Color b) {
+        final (x, y) = (a.computeLuminance(), b.computeLuminance());
+        final (lighter, darker) = x > y ? (x, y) : (y, x);
+        return (lighter + 0.05) / (darker + 0.05);
+      }
+
+      // Everything text is drawn on, including a hovered row and a chosen one:
+      // a message does not stop needing to be read because a row is selected.
+      Map<String, Color> surfaces(SlatePalette palette) => <String, Color>{
+        'background': palette.background,
+        'chrome': palette.chrome,
+        'panel': palette.panel,
+        'popover': palette.popover,
+        'hover': palette.hover,
+        'selected': palette.selected,
+        'field': palette.field,
+      };
+
+      for (final palette in <SlatePalette>[
+        SlatePalette.dark,
+        SlatePalette.light,
+      ]) {
+        final name = palette.brightness.name;
+
+        test('every text colour is 4.5:1 on every surface, $name', () {
+          // ink, inkDim and danger are the colours text is drawn in. The accent
+          // is not one of them, and is held to a glyph's 3:1 below instead.
+          final roles = <String, Color>{
+            'ink': palette.ink,
+            'inkDim': palette.inkDim,
+            'danger': palette.danger,
+          };
+          for (final role in roles.entries) {
+            for (final surface in surfaces(palette).entries) {
+              expect(
+                contrast(role.value, surface.value),
+                greaterThanOrEqualTo(4.5),
+                reason: '${role.key} on ${surface.key}',
+              );
+            }
+          }
+          expect(
+            contrast(palette.onAccent, palette.accent),
+            greaterThanOrEqualTo(4.5),
+            reason: 'a primary button\'s label on its fill',
+          );
+        });
+
+        test('a glyph is 3:1 wherever the kit draws one, $name', () {
+          for (final surface in surfaces(palette).entries) {
+            expect(
+              contrast(palette.accent, surface.value),
+              greaterThanOrEqualTo(3),
+              reason: 'the accent on ${surface.key}',
+            );
+          }
+          // The close button's hover: a white cross on the danger fill. The
+          // red that reads as text in the dark palette is only just dark
+          // enough for this, which is why both are asserted together.
+          expect(
+            contrast(const Color(0xFFFFFFFF), palette.danger),
+            greaterThanOrEqualTo(3),
+            reason: 'white on danger',
+          );
+        });
+      }
+    });
+
     test('the separator is quieter than the border it sits next to', () {
       // The design leans on this: rules between rows must not read as the
       // structural edge of a popover.
