@@ -7,6 +7,8 @@ and the package uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.9.0] - 2026-09-17
+
 ### Fixed
 
 - **`danger` could not be read as text.** It was chosen as a fill — the close
