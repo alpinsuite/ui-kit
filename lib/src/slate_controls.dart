@@ -354,6 +354,14 @@ class SlateSegmented<T> extends StatelessWidget {
       height: theme.metrics.fieldHeight,
       decoration: BoxDecoration(
         color: palette.field,
+        borderRadius: BorderRadius.circular(theme.metrics.radius),
+      ),
+      // The border is painted over the segments rather than around them. As
+      // part of `decoration` it insets the child by its own width, so a control
+      // twenty-four points high held segments of twenty-two — under the 24×24
+      // WCAG 2.2 asks of a pointer target, in a control whose own height meets
+      // it. Drawn on top, it looks the same and takes nothing from them.
+      foregroundDecoration: BoxDecoration(
         border: Border.all(color: palette.fieldBorder),
         borderRadius: BorderRadius.circular(theme.metrics.radius),
       ),
@@ -429,7 +437,11 @@ class _SegmentState extends State<_Segment> {
               overflow: TextOverflow.ellipsis,
               style: theme.textStyle.copyWith(
                 fontSize: theme.metrics.smallFontSize,
-                color: widget.selected ? palette.accent : palette.inkDim,
+                // Ink, not the accent. On the selected fill the accent is
+                // 4.00:1 in the light palette, under the 4.5 text this size
+                // needs, and the fill already says which segment is chosen —
+                // the ribbon's tabs made the same choice for the same reason.
+                color: widget.selected ? palette.ink : palette.inkDim,
               ),
             ),
           ),

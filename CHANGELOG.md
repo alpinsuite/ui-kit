@@ -104,6 +104,31 @@ and the package uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Fixed
 
+- **`SlateButton`, and every segment of a `SlateSegmented`, were smaller than a
+  pointer target has to be.** WCAG 2.2's 2.5.8, at level AA, is 24×24. A button
+  was twenty-three points high. A segmented control was twenty-four, and held
+  segments of twenty-two: its border was part of its decoration, and a
+  decoration's border insets the child by its own width.
+
+  `SlateMetrics.buttonHeight` is now 24, the value `fieldHeight` was already
+  raised to for the same reason. The segmented control paints its border over
+  the segments instead of around them, which looks exactly as it did and gives
+  each segment the control's full height.
+
+  **This is a visual change**: every text button in an application is a point
+  taller.
+
+- **A chosen segment's label could not be read on its own highlight.** It was
+  drawn in the accent, which on the selected fill is 4.00:1 in the light palette
+  — under the 4.5 text of this size needs. It is `ink` now, as the ribbon's tabs
+  already were, and the fill still says which segment is chosen. The dark
+  palette passed at 6.45:1 and changes too, so the two palettes do not disagree
+  about what a chosen segment looks like.
+
+  Both found by product_flow's accessibility audit, the first time its PDF
+  reader put a row of short text buttons and a segmented control on screen. The
+  test for each fails against the code before the fix.
+
 - **`SlateStatusBar` painted the overflow stripe as soon as an application put
   one item too many in it**, which an application will: a status bar is where
   everything ends up. It was a plain `Row` of leading, a `Spacer` and trailing,

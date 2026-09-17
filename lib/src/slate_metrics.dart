@@ -15,7 +15,7 @@ class SlateMetrics {
     this.compactRowHeight = 21,
     this.controlHeight = 20,
     this.fieldHeight = 24,
-    this.buttonHeight = 23,
+    this.buttonHeight = 24,
     this.barHeight = 30,
     this.windowBarHeight = 36,
     this.activityBarWidth = 48,
@@ -52,6 +52,13 @@ class SlateMetrics {
   /// a cursor in it. Two points is not a visible difference and it is the
   /// difference between meeting that criterion and not.
   final double fieldHeight;
+
+  /// A text button's height.
+  ///
+  /// Twenty-four, for the reason [fieldHeight] is, and it had been missed:
+  /// twenty-three is a point under WCAG 2.2's 24×24, and a button is nothing
+  /// but a target. Found by an application's accessibility audit the first
+  /// time a row of short text buttons was on screen.
   final double buttonHeight;
 
   /// Tool options and status rows.

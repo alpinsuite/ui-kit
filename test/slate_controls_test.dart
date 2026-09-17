@@ -18,6 +18,22 @@ void main() {
       expect(taps, 1);
     });
 
+    testWidgets('is a target big enough to hit', (tester) async {
+      // WCAG 2.2's pointer-target criterion, 2.5.8 at level AA, is 24×24. The
+      // button was twenty-three high — a point short, found by an
+      // application's accessibility audit the first time a row of short text
+      // buttons was on screen.
+      await tester.pumpWidget(wrap(SlateButton(label: 'Aa', onPressed: () {})));
+
+      final target = find
+          .descendant(
+            of: find.byType(SlateButton),
+            matching: find.byType(GestureDetector),
+          )
+          .first;
+      expect(tester.getSize(target).height, greaterThanOrEqualTo(24));
+    });
+
     testWidgets('a null callback disables it', (tester) async {
       await tester.pumpWidget(
         wrap(const SlateButton(label: 'Save', onPressed: null)),
@@ -307,7 +323,35 @@ void main() {
       expect(chosen, 'Stroke');
     });
 
-    testWidgets('the chosen label is drawn in the accent', (tester) async {
+    testWidgets('every segment is a target big enough to hit', (tester) async {
+      // The control was twenty-four high and every segment in it twenty-two:
+      // the border, drawn as a decoration, inset its child by a point on each
+      // side. Measured on the segments, because the control's own height was
+      // never the problem.
+      await tester.pumpWidget(
+        wrap(
+          SlateSegmented<String>(
+            value: 'Read',
+            values: const <String>['Read', 'Both', 'Source'],
+            labelOf: (value) => value,
+            onChanged: (_) {},
+          ),
+        ),
+      );
+
+      final segments = find.descendant(
+        of: find.byType(SlateSegmented<String>),
+        matching: find.byType(GestureDetector),
+      );
+      expect(segments, findsNWidgets(3));
+      for (var i = 0; i < 3; i++) {
+        expect(tester.getSize(segments.at(i)).height, greaterThanOrEqualTo(24));
+      }
+    });
+
+    testWidgets('the chosen label is ink, and its fill says it is chosen', (
+      tester,
+    ) async {
       await tester.pumpWidget(
         wrap(
           SlateSegmented<String>(
@@ -321,13 +365,46 @@ void main() {
 
       expect(
         tester.widget<Text>(find.text('Fill')).style!.color,
-        SlatePalette.dark.accent,
+        SlatePalette.dark.ink,
       );
       expect(
         tester.widget<Text>(find.text('Stroke')).style!.color,
         SlatePalette.dark.inkDim,
       );
+      final chosen = tester.widget<Container>(
+        find
+            .ancestor(of: find.text('Fill'), matching: find.byType(Container))
+            .first,
+      );
+      expect(chosen.color, SlatePalette.dark.selected);
     });
+
+    for (final theme in const <SlateThemeData>[
+      SlateThemeData.light(),
+      SlateThemeData.dark(),
+    ]) {
+      testWidgets('the chosen label is readable on its fill, '
+          '${theme.palette.brightness.name}', (tester) async {
+        // The accent on the selected fill is 4.00:1 in the light palette,
+        // under the 4.5 text this size needs — the colour that said "this
+        // one" was the one colour on the control that could not be read.
+        final handle = tester.ensureSemantics();
+        await tester.pumpWidget(
+          wrap(
+            SlateSegmented<String>(
+              value: 'Read',
+              values: const <String>['Read', 'Both', 'Source'],
+              labelOf: (value) => value,
+              onChanged: (_) {},
+            ),
+            theme: theme,
+          ),
+        );
+
+        await expectLater(tester, meetsGuideline(textContrastGuideline));
+        handle.dispose();
+      });
+    }
   });
 
   group('SlateSlider', () {
