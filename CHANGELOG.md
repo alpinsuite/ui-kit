@@ -7,6 +7,8 @@ and the package uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.10.0] - 2026-09-20
+
 ### Changed
 
 - **Relicensed to Apache-2.0** from MIT. Still permissive: use it, change it,
